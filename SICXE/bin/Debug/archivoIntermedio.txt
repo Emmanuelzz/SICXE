@@ -1,7 +1,7 @@
 			Archivo Intermedio
 
 LINEA	CP				Codigo Objeto y/o Errores
-0	0000	EJERCISIO	START	0	
+0	0000	EJERCICIO	START	0	
 1	0000		LDX	#8056	
 2	0003		HIO		
 3	0004		+LDB	#TABLE2	

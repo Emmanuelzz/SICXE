@@ -56,7 +56,6 @@
             this.analizar.TabIndex = 0;
             this.analizar.Text = "ANALIZAR";
             this.analizar.UseVisualStyleBackColor = true;
-            this.analizar.Click += new System.EventHandler(this.analizar_Click);
             // 
             // dt_TabSim
             // 
@@ -94,7 +93,7 @@
             this.ERRORES});
             this.dtg_archIn.Location = new System.Drawing.Point(42, 56);
             this.dtg_archIn.Name = "dtg_archIn";
-            this.dtg_archIn.Size = new System.Drawing.Size(810, 462);
+            this.dtg_archIn.Size = new System.Drawing.Size(823, 462);
             this.dtg_archIn.TabIndex = 3;
             // 
             // Linea

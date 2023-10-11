@@ -22,11 +22,441 @@ namespace SICXE
         string operando = "";
         string contP = "";
         string b = "-1";
-        public Form1()
+        string programaleido= "";
+        List<string> lineas;
+        public Form1(List<string> programasicxe)
         {
             InitializeComponent();
+
+            lineas = programasicxe;
+            analizaPrograma();
         }
 
+        private void analizaPrograma()
+        {
+            #region paso uno
+            List<string> lang1 = new List<string>();
+            List<string> lang2 = new List<string>();
+            List<string> numlinea = new List<string>();
+            List<string> colcp = new List<string>();
+            List<string> coletiq = new List<string>();
+            List<string> coloper = new List<string>();
+            List<string> colinstr = new List<string>();
+            List<string> colerr = new List<string>();
+            List<string> aux = new List<string>();
+            List<List<string>> tabSim = new List<List<string>>();//Lista para la tabla de simbolos
+            List<List<string>> archivointermedio = new List<List<string>>();
+            List<string> formatos = new List<string>();
+            List<string> modosdir = new List<string>();
+            int contint = 0;
+            tabSim.Add(lang1);
+            tabSim.Add(lang2);
+            archivointermedio.Add(numlinea);
+            archivointermedio.Add(colcp);
+            archivointermedio.Add(coletiq);
+            archivointermedio.Add(colinstr);
+            archivointermedio.Add(coloper);
+            archivointermedio.Add(colerr);
+            int linea = 0;
+            int ce = 0;
+            string t = "";
+            List<string> codObj = new List<string>();//Lista para el manejo del cp (codObj[0]) y errores (codObj[1])
+            String line;
+            int reng = 0;
+
+
+            if (lineas.Count>0)
+            {
+
+               string path = Environment.CurrentDirectory;
+               //Pass the filepath and filename to the StreamWriter Constructor
+               StreamWriter sw = new StreamWriter(path + "\\prueba.err");
+               //archivo intermedio
+               StreamWriter archInt = new StreamWriter(path + "\\archivoIntermedio.txt");
+               archInt.WriteLine("\t\t\tArchivo Intermedio\n");
+               archInt.WriteLine("LINEA\tCP\t\t\t\tCodigo Objeto y/o Errores");
+               codObj.Add("0000");
+               codObj.Add("");
+
+               foreach (string elemento in lineas)
+               {
+                    line = elemento;
+
+                    analizadorLSLexer lex = new analizadorLSLexer(new AntlrInputStream(line));
+                    //CREAMOS UN LEXER CON LA CADENA QUE ESCRIBIO EL USUARIO
+                    CommonTokenStream tokens = new CommonTokenStream(lex);
+                    //CREAMOS LOS TOKENS SEGUN EL LEXER CREADO
+                    analizadorLSParser parser = new analizadorLSParser(tokens);
+                    //CREAMOS EL PARSER CON LOS TOKENS CREADOS
+                    var errorListener = new ErrorListener();
+                    parser.RemoveErrorListeners();
+                    parser.AddErrorListener(errorListener);
+                    codObj[1] = "";//Se restable el valor del error para el siguiente calculo
+
+                    string cp = codObj[0]; //obtiene el valor cp actual ya que cp apunta al siguiente
+                                           //System.Console.WriteLine("Resultado linea:"+linea.ToString());
+                    
+                    if (codObj[0] == "0000" && contint == 0)
+                    {
+                        formatos.Add("");
+                        contint = 1;
+                    }
+
+                    formatos.Add("");
+                    modosdir.Add("");
+                    parser.programa(ref codObj, ref tabSim, ref formatos, ref reng, ref modosdir);//Parametros por referencia para el calculo del cp,errores y tabsim
+                                                                                                  //SE VERIFICA QUE EL ANALIZADOR EMPIECE CON LA EXPRESION
+                    separaexpresion(line);
+                    if (reng != 0)
+                    {
+                        List<string> nuevoRenglon = new List<string>();
+                        archivointermedio.Add(nuevoRenglon);
+                    }
+                    if (etiqueta != "" && instruccion == "" && operando == null)
+                    {
+                        instruccion = etiqueta;
+                        etiqueta = "";
+                    }
+                    else
+                    {
+                        if (etiqueta != "" && instruccion != "" && operando == null)
+                        {
+                            string auxins = instruccion;
+                            instruccion = etiqueta;
+                            operando = auxins;
+                            etiqueta = "";
+                        }
+                        else
+                        {
+                            if (etiqueta != "" && instruccion == null)
+                            {
+                                instruccion = etiqueta;
+                                etiqueta = "";
+                                modosdir[reng] = "";
+                            }
+                        }
+                    }
+                    //ESCRIBIR RENGLON EN LISTA DE LISTAS
+                    for (int i = 0; i <= 8; i++)
+                    {
+                        if (i == 0)
+                        {
+                            archivointermedio[reng].Add(linea.ToString());
+                        }
+                        if (i == 1)
+                        {
+                            archivointermedio[reng].Add(formatos[reng]);
+                        }
+                        if (i == 2)
+                        {
+                            archivointermedio[reng].Add(cp);
+                        }
+                        if (i == 3)
+                        {
+                            archivointermedio[reng].Add(etiqueta);
+                        }
+                        if (i == 4)
+                        {
+                            archivointermedio[reng].Add(instruccion);
+                        }
+                        if (i == 5)
+                        {
+                            archivointermedio[reng].Add(operando);
+                        }
+                        if (i == 6)
+                        {
+                            archivointermedio[reng].Add(modosdir[reng]);
+                        }
+                        if (i == 7)
+                        {
+                            archivointermedio[reng].Add("");
+                        }
+                        if (i == 8)
+                        {
+                            archivointermedio[reng].Add(codObj[1].ToString());
+                        }
+                    }
+                    reng++;
+
+                    //Se escribe en el archivo la linea que corresponde con los datos
+                    archInt.WriteLine(linea.ToString() + "\t" + cp + "\t" + etiqueta + "\t" + instruccion + "\t" + operando + "\t" + codObj[1].ToString());
+
+                    if (errorListener.Errors.Count > 0)
+                    {
+                        //Console.WriteLine("Error linea:"+linea.ToString());
+                        foreach (var error in errorListener.Errors)
+                        {
+                            Console.WriteLine("Linea:" + linea.ToString() + " " + error);
+                            try
+                            {
+                                ce++;
+                                //Write a line of text
+                                sw.WriteLine("Linea:" + linea.ToString() + " " + error.ToString());
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Exception: " + ex.Message);
+                            }
+                        }
+                    }
+                    linea++;
+               }
+                   archInt.WriteLine("\nTABSIM\n");
+                    t = "";
+                    //Se cargan los datos de la tabla de simbolos a dataGrid
+                    dt_TabSim.Rows.Clear();
+                    dt_TabSim.DataSource = null;
+                    dt_TabSim.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+                for (int i = 0; i < tabSim[0].Count; i++)
+                {
+                    dt_TabSim.Rows.Add();
+                    for (int j = 0; j < tabSim.Count; j++)
+                    {
+                        dt_TabSim.Rows[i].Cells[j].Value = tabSim[j][i];
+                        t += tabSim[j][i] + "\t";
+                    }
+                    archInt.WriteLine(t);
+                    t = "";
+
+
+                }
+
+                sw.Close();
+                archInt.Close();
+            }
+            else
+            {
+                MessageBox.Show("PROGRAMA SIN CODIGO A COMPILAR");
+                return;
+            }
+            #endregion
+
+
+            #region paso dos
+   
+            for (int i = 0; i < archivointermedio.Count; i++)
+            {
+                if (archivointermedio[i].Count != 0)
+                {
+                    if (archivointermedio[i][4] != "END")
+                        contP = archivointermedio[i + 1][2];
+                    generaCodObj(archivointermedio[i], tabSim, contP, b);
+                }
+            }
+            Tam.Text = "Tamaño del programa:" + contP;
+            dtg_archIn.Rows.Clear();
+            dtg_archIn.DataSource = null;
+            dtg_archIn.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            for (int i = 0; i < archivointermedio.Count; i++)
+            {
+                if (archivointermedio[i].Count != 0)
+                {
+                    dtg_archIn.Rows.Add();
+                    for (int j = 0; j < archivointermedio[i].Count; j++)
+                    {
+                        dtg_archIn.Rows[i].Cells[j].Value = archivointermedio[i][j];
+
+                    }
+                }
+            }
+            dtg_archIn.AutoResizeColumns();
+            foreach (DataGridViewColumn column in dtg_archIn.Columns)
+            {
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            }
+
+
+
+
+            #endregion
+
+            #region registros
+            //registro H
+            string n = "";
+            string nombre = "";
+            string primIn = "";
+            int contador = 0;
+            bool bandera = true;
+            int index = 0;
+            string tem = "";
+            List<string> relocalizables = new List<string>();//lista para el majo de todos los registros M
+            List<string> codobjetosregistros = new List<string>();
+            nombre = registroH(archivointermedio[0][3]);//Toma el nombre del programa
+            registros.Items.Add("H" + nombre + "00" + archivointermedio[0][2] + "00" + contP);//se añade el registro H
+            n = "T";
+            foreach (List<string> list in archivointermedio)
+            {//recorre toda la matriz del archivo intermedio 
+             //para generar los archivos T y M
+                if (list.Count != 0)
+                {
+                    if (list[7] != "" && list[4] != "WORD" && list[4] != "BYTE" && primIn == "")//Toma la primera instruccion
+                    {
+                        primIn = list[2];
+                    }
+                    if (list[7] != "" && bandera)//Va generando el registro T
+                    {
+                        bandera = false;
+                        n += "00" + list[2];
+                        tem = list[7];
+                    }
+                    if (list[4] == "RESB" || list[4] == "RESW" || contador >= 31 || list[4] == "END")//Corta el archivo T
+                    {
+                        index = archivointermedio.IndexOf(list);
+                        n += contador.ToString("X2") + tem;
+
+                        if (tem != archivointermedio[index - 1][7])
+                        {
+                            if (codobjetosregistros.Count > 1)
+                            {
+                                n += string.Join("", codobjetosregistros.Skip(1));
+                            }
+                        }
+                        registros.Items.Add(n);
+                        bandera = true;
+                        contador = 0;
+                        n = "T";
+                        tem = "";
+                        codobjetosregistros.Clear();
+                    }
+                    if (list[7] != "")//aumenta el tamaño del registro T
+                    {
+                        if (list[7].Contains("*"))
+                        {
+                            contador += list[7].Replace("*", "").Length / 2;
+                            codobjetosregistros.Add(list[7].Replace("*", ""));
+                        }
+                        else
+                        {
+                            contador += list[7].Length / 2;
+                            codobjetosregistros.Add(list[7]);
+                        }
+                    }
+                    if (list[7] != "" && list[7].Contains("*"))//Añade un nuevo registro M
+                    {
+                        int val = Convert.ToInt16(list[2], 16);
+                        val++;
+                        string re = val.ToString("X6");
+                        relocalizables.Add("M" + re + "05" + "+" + nombre);
+                    }
+                    if (list[4] == "END")//Toma el indice de la etiqueta END
+                    {
+                        index = archivointermedio.IndexOf(list);
+                    }
+                }
+            }
+            foreach (string m in relocalizables)
+            {//Recorre todos los registros M para añadirlos al archivo
+                registros.Items.Add(m);
+            }
+
+
+            if (archivointermedio[index][5] == "")// si la etiqueta end no tiene op
+            {
+                registros.Items.Add("E" + "00" + primIn);
+            }
+            else if (tabSim[0].IndexOf(archivointermedio[index][5]) >= 0)
+            {//si la op esta en tabsim toma el valor
+                index = tabSim[0].IndexOf(archivointermedio[index][5]);
+                registros.Items.Add("E" + "00" + tabSim[1][index]);
+            }
+            else //si no esta en tabsim
+            {
+                registros.Items.Add("EFFFFFF");
+                archivointermedio[index][8] = "Error: Simbolo no encontrado en TabSim";
+                dtg_archIn.Rows[index].Cells[8].Value = "Error: Simbolo no encontrado en TabSim";
+            }
+            #endregion
+
+            escribearchivointermedio(tabSim);
+
+
+        }
+
+        #region ESCRIBE ARCHIVO INTERMEDIO
+        private void escribearchivointermedio(List<List<string>> tabSim)
+        {
+            string t = "";
+            string path1 = Environment.CurrentDirectory;
+            // Abre el archivo intermedio 
+            StreamWriter ArchInt2 = new StreamWriter(path1 + "\\archivoIntermedio2.txt"); 
+            ArchInt2.WriteLine("\t\t\tArchivo Intermedio\n");
+            ArchInt2.WriteLine("LINEA\tFORM\tCP\tETIQUETA   INSTR   OP\t\tMOD\tCodigo Objeto\tErrores");
+
+            string linea2 = "";
+            string cp2 = "";
+            string formato2 = "";
+            string etiqueta2 = "";
+            string instruccion2 = "";
+            string operando2 = "";
+            string modo2 = "";
+            string codobj2 = "";
+            string errores2 = "";
+
+
+            // ancho de cada columna
+            int columnaAnchoLinea = 10;
+            int columnaAnchoFormato = 6;
+            int columnaAnchoCP = 8;
+            int columnaAnchoEtiqueta = 11;
+            int columnaAnchoInstruccion = 8;
+            int columnaAnchoOperando = 10;
+            int columnaAnchoModo = 13;
+            int columnaAnchoCodObjeto = 12;
+            int columnaAnchoErrores = 20;
+
+            // Recorre el DataGridView 
+            for (int i = 0; i < dtg_archIn.Rows.Count; i++)
+            {
+                // obtiene valores de celdas
+                linea2 = dtg_archIn.Rows[i].Cells[0].Value?.ToString() ?? "";
+                formato2 = dtg_archIn.Rows[i].Cells[1].Value?.ToString() ?? "";
+                cp2 = dtg_archIn.Rows[i].Cells[2].Value?.ToString() ?? "";
+                etiqueta2 = dtg_archIn.Rows[i].Cells[3].Value?.ToString() ?? "";
+                instruccion2 = dtg_archIn.Rows[i].Cells[4].Value?.ToString() ?? "";
+                operando2 = dtg_archIn.Rows[i].Cells[5].Value?.ToString() ?? "";
+                modo2 = dtg_archIn.Rows[i].Cells[6].Value?.ToString() ?? "";
+                codobj2 = dtg_archIn.Rows[i].Cells[7].Value?.ToString() ?? "";
+                errores2 = dtg_archIn.Rows[i].Cells[8].Value?.ToString() ?? "";
+
+                // Formatea la línea con espaciado fijo para cada columna
+                string formattedLine = $"{linea2.PadRight(columnaAnchoLinea)}" +
+                                       $"{formato2.PadRight(columnaAnchoFormato)}" +
+                                       $"{cp2.PadRight(columnaAnchoCP)}" +
+                                       $"{etiqueta2.PadRight(columnaAnchoEtiqueta)}" +
+                                       $"{instruccion2.PadRight(columnaAnchoInstruccion)}" +
+                                       $"{operando2.PadRight(columnaAnchoOperando)}" +
+                                       $"{modo2.PadRight(columnaAnchoModo)}" +
+                                       $"{codobj2.PadRight(columnaAnchoCodObjeto)}" +
+                                       $"{errores2.PadRight(columnaAnchoErrores)}";
+
+                // Escribe la línea en el archivo intermedio
+                ArchInt2.WriteLine(formattedLine);
+            }
+            
+
+            // Agrega los datos de dt_TabSim al archivo intermedio
+            ArchInt2.WriteLine("\nTABSIM\n");
+            t = "";
+            for (int i = 0; i < tabSim[0].Count; i++)
+            {
+                ArchInt2.WriteLine(string.Join("\t", tabSim.Select(list => list[i])));
+            }
+
+            ArchInt2.WriteLine("\nREGISTROS\n");
+            foreach (string elemento in registros.Items)
+            {
+                // Escribe cada elemento del ListBox en una línea del archivo
+                ArchInt2.WriteLine(elemento);
+            }
+
+            // Cierra el archivo en modo append
+            ArchInt2.Close();
+        }
+        #endregion
+
+        //ANALISIS A PARTIR DEL CLICK EN BOTON DE INTERFAZ
+        /*
         private void analizar_Click(object sender, EventArgs e)
         {
             #region paso uno
@@ -367,7 +797,13 @@ namespace SICXE
             }
             #endregion
         }
+        */
 
+
+        #region CODIGO FUNCIONAL  
+
+
+        #region GENERACION REGISTRO H
         public string registroH(string n) {
             int tamaño = 0;
             if (n.Length >= 7)
@@ -384,7 +820,9 @@ namespace SICXE
             }
             return n;
         }
+        #endregion
 
+        #region GENERACION CODIGO OBJETO
         public string generaCodObj(List<string> archIn, List<List<string>> tabSim, string cp,string b) {
             string obj = "";
             string codop = "";
@@ -1272,7 +1710,10 @@ namespace SICXE
             }
             return obj;
         }
+        #endregion
 
+
+        #region METODOS UTILES Y VALIDACIONES
         public void separaexpresion(string s)
         {
             
@@ -1491,9 +1932,12 @@ namespace SICXE
         }
 
     }
+    #endregion
+
+    #endregion
 
 
-
+    #region MANEJADOR ERRORES
     public class ErrorListener : BaseErrorListener 
     {
         public List<string> Errors { get; } = new List<string>();
@@ -1511,4 +1955,6 @@ namespace SICXE
             Errors.Add(error);
         }
     }
+    #endregion
+
 }

@@ -1,6 +1,6 @@
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSLexer.cs
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSParser.cs
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSListener.cs
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSBaseListener.cs
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSVisitor.cs
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSBaseVisitor.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSLexer.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSParser.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSListener.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSBaseListener.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSVisitor.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSBaseVisitor.cs

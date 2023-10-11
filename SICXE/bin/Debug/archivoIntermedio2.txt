@@ -1,0 +1,37 @@
+			Archivo Intermedio
+
+LINEA	FORM	CP	ETIQUETA   INSTR   OP		MOD	Codigo Objeto	Errores
+0               0000    EJERCICIO  START   0                                                      
+1         3     0000               LDX     #8056     INMEDIATO    056FFF       Error: No es relativo ni al CP ni a la Base
+2         1     0003               HIO                            F4                              
+3         4     0004               +LDB    #TABLE2   INMEDIATO    69100060*                       
+4         3     0008               STA     @COUNT    INDIRECTO    0E200E                          
+5         2     000B               CLEAR   A                      B400                            
+6               000D               BASE    TABLE2                                                 
+7         2     000D               ADDR    A,T                    9005                            
+8         3     000F    LOOP       ADD     TABLE,X   SIMPLE       1BA01B                          
+9         4     0012               +STA    TOTAL     SIMPLE       0F7FFFFF     Error: Simbolo no encontrado
+10        3     0016               RSUB                           4C0000                          
+11              0019    COUNT      RESB    12H                                                    
+12        2     002B               SHIFTL  A,2                    A401                            
+13              002D    TABLE      RESW    17                                                     
+14              0060    TABLE2     BYTE    C'TEST'                54455354                        
+15              0064               WORD    17                     000011                          
+16              0067               END     COUNT                              Error:Simbolo Duplicado
+                                                                                                  
+
+TABSIM
+
+LOOP	000F
+COUNT	0019
+TABLE	002D
+TABLE2	0060
+
+REGISTROS
+
+HEJERCI000000000067
+T00000019056FFFF4691000600E200EB40090051BA01B0F7FFFFF4C0000
+T00002B02A401
+T0000600754455354000011
+M00000505+EJERCI
+E000019
