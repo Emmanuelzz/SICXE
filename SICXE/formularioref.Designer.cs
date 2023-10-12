@@ -149,10 +149,11 @@
             this.ClientSize = new System.Drawing.Size(843, 558);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.toolStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.IsMdiContainer = true;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "formularioref";
-            this.Text = "MAIN";
+            this.Text = "SICXE Compiler";
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.statusStrip.ResumeLayout(false);

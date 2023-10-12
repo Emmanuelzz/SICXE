@@ -20,6 +20,13 @@ namespace SICXE
         private RichTextBox richTextBox;
         private bool importedFile = false; // Bandera para verificar si se importó un archivo
         private string importedText = null; // Variable para almacenar el contenido importado
+        string[] Reservadas = new string[] { "WORD", "BYTE","RESB", "RESW","END","START","BASE"};
+        string[] Reservadas2 = new string[] { "LDX", "HIO", "LDB", "+LDB", "STA", "CLEAR","ADDR","ADD","+STA","RSUB","SHIFTL" };
+        int posicion = 0;
+        private int tabPageNumber = 1; // Contador para nombres de pestañas
+        private TabControl tabControl1;
+        int calculo = 0;
+
 
         public formularioref()
         {
@@ -30,13 +37,20 @@ namespace SICXE
 
         private void ShowNewForm(object sender, EventArgs e)
         {
+
             Form childForm = new Form();
             childForm.MdiParent = this;
             childForm.Text = "Ventana " + childFormNumber++;
             childForm.FormBorderStyle = FormBorderStyle.None;
-
-            // Configura el tamaño del formulario secundario 
             childForm.Size = this.ClientSize;
+
+            tabControl1 = new TabControl();
+            tabControl1.Dock = DockStyle.Fill;
+            childForm.Controls.Add(tabControl1);
+
+            // Crea un nuevo TabPage y lo agrega al TabControl
+            TabPage tabPage = new TabPage();
+            tabPage.Text = "EDITOR " + tabPageNumber++;
 
             richTextBox = new RichTextBox();
 
@@ -56,6 +70,7 @@ namespace SICXE
                          "----ESCRIBE TU CÓDIGO PARA LA ARQUITECTURA SICXE-----*/" + "\r\n";
 
             richTextBox.Text = texto;
+
 
             int startIndex = 0;
             while (startIndex < texto.Length)
@@ -78,13 +93,18 @@ namespace SICXE
             richTextBox.TextChanged += (sender2, e2) =>
             {
                 HighlightComments(richTextBox);
+                //posicion = richTextBox.SelectionStart;
+                //ejecucion();
             };
 
-            childForm.Controls.Add(richTextBox);
+            tabPage.Controls.Add(richTextBox);
+
+            // Agregar el nuevo TabPage al TabControl
+            tabControl1.TabPages.Add(tabPage);
 
             saveToolStripButton.Visible = true;
 
-
+            tabPage.Controls.Add(richTextBox);
 
             childForm.Dock = DockStyle.Fill;
 
@@ -102,7 +122,7 @@ namespace SICXE
         private void HighlightComments(RichTextBox richTextBox)
         {
             toolStrip.Focus();
-            
+
             // Almacena temporalmente la selección actual
             int start = richTextBox.SelectionStart;
             int length = richTextBox.SelectionLength;
@@ -114,6 +134,39 @@ namespace SICXE
             richTextBox.SelectAll();
             richTextBox.SelectionColor = richTextBox.ForeColor;
 
+            // Define una expresión regular para identificar las palabras reservadas de Reservadas
+            string reservadasPattern = string.Join("|", Reservadas.Select(Regex.Escape));
+
+            // Crear la expresión regular
+            Regex regexReservadas = new Regex($@"\b({reservadasPattern})\b", RegexOptions.IgnoreCase);
+
+            // Colorea las coincidencias de Reservadas
+            foreach (Match match in regexReservadas.Matches(texto))
+            {
+                if (!IsInsideComment(texto, match.Index))
+                {
+                    richTextBox.Select(match.Index, match.Length);
+                    richTextBox.SelectionColor = Color.Blue; // Color para Reservadas
+                }
+            }
+
+            // Define una expresión regular para identificar las palabras reservadas de Reservadas2
+            string reservadasPattern2 = string.Join("|", Reservadas2.Select(Regex.Escape));
+
+            // Crea la expresión regular para Reservadas2
+            Regex regexReservadas2 = new Regex($@"\b({reservadasPattern2})\b", RegexOptions.IgnoreCase);
+
+            // Colorea las coincidencias de Reservadas2
+            foreach (Match match in regexReservadas2.Matches(texto))
+            {
+                if (!IsInsideComment(texto, match.Index))
+                {
+                    richTextBox.Select(match.Index, match.Length);
+                    richTextBox.SelectionColor = Color.Red; // Color para Reservadas2
+                }
+            }
+
+            // Colorea los comentarios
             int startIndex = 0;
             while (startIndex < texto.Length)
             {
@@ -123,6 +176,7 @@ namespace SICXE
                 int comentarioFin = texto.IndexOf("*/", comentarioInicio);
                 if (comentarioFin == -1) break;
 
+                // Colorea el comentario en verde
                 richTextBox.Select(comentarioInicio, comentarioFin - comentarioInicio + 2);
                 richTextBox.SelectionColor = Color.Green;
 
@@ -134,6 +188,39 @@ namespace SICXE
             richTextBox.Focus();
             textorichtextbox = richTextBox.Text;
         }
+
+        // Función para verificar si una posición dada está dentro de un comentario
+        private bool IsInsideComment(string texto, int position)
+        {
+            int startIndex = 0;
+            bool insideComment = false;
+
+            while (startIndex < texto.Length)
+            {
+                int comentarioInicio = texto.IndexOf("/*", startIndex);
+                if (comentarioInicio == -1) break;
+
+                int comentarioFin = texto.IndexOf("*/", comentarioInicio);
+                if (comentarioFin == -1) break;
+
+                if (position > comentarioInicio && position < comentarioFin)
+                {
+                    insideComment = true;
+                    break;
+                }
+
+                startIndex = comentarioFin + 2;
+            }
+
+            return insideComment;
+        }
+
+
+
+
+
+
+
 
 
         private void OpenFile(object sender, EventArgs e)
@@ -232,30 +319,82 @@ namespace SICXE
 
         private void saveToolStripButton_Click(object sender, EventArgs e)
         {
-
             // Usa una expresión regular para eliminar los comentarios
             string textoSinComentarios = Regex.Replace(textorichtextbox, @"/\*.*?\*/", "", RegexOptions.Singleline);
             // Separa el texto en líneas y guárdalo en una lista
             List<string> lineas = textoSinComentarios.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            // Crea una instancia de form1 y pása el texto
-            if (lineas.Count > 0)
+            if (tabControl1 != null && tabControl1.TabPages.Count == 1)
             {
-                Form1 form1 = new Form1(lineas);
+                Form childForm = new Form();
+                childForm.Text = "Ventana " + childFormNumber++;
+                childForm.FormBorderStyle = FormBorderStyle.None;
+                childForm.Size = this.ClientSize;
+                childForm.MdiParent = this;
+                TabPage tabPage2 = new TabPage("ENSAMBLADOR");
+                tabControl1.TabPages.Add(tabPage2);
                 
-                form1.MdiParent = this;
-                form1.Text = "Ventana " + childFormNumber++;
-                form1.FormBorderStyle = FormBorderStyle.None;
 
-                // Configura el tamaño del formulario secundario 
-                form1.Size = this.ClientSize;
-                form1.Show();
+                if (lineas.Count > 0)
+                {
+                    Form1 form1 = new Form1(lineas);
+
+                    // Encuentra la segunda pestaña en el TabControl (0 para la primera, 1 para la segunda, etc.)
+                    TabPage secondTabPage = tabControl1.TabPages[1];
+
+                    form1.TopLevel = false; // Esto permite que el formulario se convierta en un control
+                    form1.FormBorderStyle = FormBorderStyle.None;
+
+                    secondTabPage.Controls.Add(form1);
+
+                    form1.Dock = DockStyle.Fill;
+                    
+                    form1.Show();
+                    calculo = 1;
+                    lineas.Clear();
+                    
+                }
+                else
+                {
+                    MessageBox.Show("PROGRAMA SIN CODIGO A COMPILAR");
+                    return;
+                }
             }
             else
             {
-                MessageBox.Show("PROGRAMA SIN CODIGO A COMPILAR");
-                return;
+                if (tabControl1.TabPages.Count == 2 && calculo == 1)
+                {
+                    // Busca una instancia existente de Form1 dentro de la pestaña 2
+                    Form1 form1 = null;
+                    foreach (Control control in tabControl1.TabPages[1].Controls)
+                    {
+                        if (control is Form1)
+                        {
+                            form1 = (Form1)control;
+                            break;
+                        }
+                    }
+
+
+                        // Si no existe una instancia de Form1, crea una nueva
+                        form1 = new Form1(lineas);
+                        form1.TopLevel = false;
+                        form1.FormBorderStyle = FormBorderStyle.None;
+                        tabControl1.TabPages[1].Controls.Add(form1);
+                        form1.Dock = DockStyle.Fill;
+                        form1.Show();
+                    
+
+                    calculo = 1;
+                    lineas.Clear();
+                }
+
+
+
+
+
             }
         }
+
 
         private void pegarToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -307,5 +446,9 @@ namespace SICXE
             }
         }
 
+        private void formularioref_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -68,13 +68,7 @@ namespace SICXE
             if (lineas.Count>0)
             {
 
-               string path = Environment.CurrentDirectory;
-               //Pass the filepath and filename to the StreamWriter Constructor
-               StreamWriter sw = new StreamWriter(path + "\\prueba.err");
-               //archivo intermedio
-               StreamWriter archInt = new StreamWriter(path + "\\archivoIntermedio.txt");
-               archInt.WriteLine("\t\t\tArchivo Intermedio\n");
-               archInt.WriteLine("LINEA\tCP\t\t\t\tCodigo Objeto y/o Errores");
+               
                codObj.Add("0000");
                codObj.Add("");
 
@@ -178,8 +172,6 @@ namespace SICXE
                     }
                     reng++;
 
-                    //Se escribe en el archivo la linea que corresponde con los datos
-                    archInt.WriteLine(linea.ToString() + "\t" + cp + "\t" + etiqueta + "\t" + instruccion + "\t" + operando + "\t" + codObj[1].ToString());
 
                     if (errorListener.Errors.Count > 0)
                     {
@@ -191,7 +183,6 @@ namespace SICXE
                             {
                                 ce++;
                                 //Write a line of text
-                                sw.WriteLine("Linea:" + linea.ToString() + " " + error.ToString());
 
                             }
                             catch (Exception ex)
@@ -202,7 +193,7 @@ namespace SICXE
                     }
                     linea++;
                }
-                   archInt.WriteLine("\nTABSIM\n");
+
                     t = "";
                     //Se cargan los datos de la tabla de simbolos a dataGrid
                     dt_TabSim.Rows.Clear();
@@ -216,14 +207,12 @@ namespace SICXE
                         dt_TabSim.Rows[i].Cells[j].Value = tabSim[j][i];
                         t += tabSim[j][i] + "\t";
                     }
-                    archInt.WriteLine(t);
+                  
                     t = "";
 
 
                 }
 
-                sw.Close();
-                archInt.Close();
             }
             else
             {
@@ -369,7 +358,7 @@ namespace SICXE
             #endregion
 
             escribearchivointermedio(tabSim);
-
+            escriberegistrosarchivo();
 
         }
 
@@ -379,7 +368,7 @@ namespace SICXE
             string t = "";
             string path1 = Environment.CurrentDirectory;
             // Abre el archivo intermedio 
-            StreamWriter ArchInt2 = new StreamWriter(path1 + "\\archivoIntermedio2.txt"); 
+            StreamWriter ArchInt2 = new StreamWriter(path1 + "\\archivoIntermedio.txt"); 
             ArchInt2.WriteLine("\t\t\tArchivo Intermedio\n");
             ArchInt2.WriteLine("LINEA\tFORM\tCP\tETIQUETA   INSTR   OP\t\tMOD\tCodigo Objeto\tErrores");
 
@@ -452,6 +441,26 @@ namespace SICXE
 
             // Cierra el archivo en modo append
             ArchInt2.Close();
+        }
+        #endregion
+
+        #region ESCRIBE ARCHIVO DE REGISTROS
+        private void escriberegistrosarchivo()
+        {
+            string t = "";
+            string path1 = Environment.CurrentDirectory;
+            // Abre el archivo intermedio 
+            StreamWriter reg = new StreamWriter(path1 + "\\registros.txt");
+         
+            reg.WriteLine("\nREGISTROS\n");
+            foreach (string elemento in registros.Items)
+            {
+                // Escribe cada elemento del ListBox en una línea del archivo
+                reg.WriteLine(elemento);
+            }
+
+            // Cierra el archivo en modo append
+            reg.Close();
         }
         #endregion
 
