@@ -18,7 +18,6 @@ LINEA	FORM	CP	ETIQUETA   INSTR   OP		MOD	Codigo Objeto	Errores
 14              0060    TABLE2     BYTE    C'TEST'                54455354                        
 15              0064               WORD    17                     000011                          
 16              0067               END     COUNT                              Error:Simbolo Duplicado
-                                                                                                  
 
 TABSIM
 

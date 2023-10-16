@@ -48,6 +48,8 @@ namespace SICXE
             List<List<string>> archivointermedio = new List<List<string>>();
             List<string> formatos = new List<string>();
             List<string> modosdir = new List<string>();
+            
+
             int contint = 0;
             tabSim.Add(lang1);
             tabSim.Add(lang2);
@@ -63,6 +65,7 @@ namespace SICXE
             List<string> codObj = new List<string>();//Lista para el manejo del cp (codObj[0]) y errores (codObj[1])
             String line;
             int reng = 0;
+
 
 
             if (lineas.Count>0)
@@ -237,6 +240,7 @@ namespace SICXE
             dtg_archIn.Rows.Clear();
             dtg_archIn.DataSource = null;
             dtg_archIn.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dtg_archIn.AllowUserToAddRows=false;
             for (int i = 0; i < archivointermedio.Count; i++)
             {
                 if (archivointermedio[i].Count != 0)
@@ -359,6 +363,21 @@ namespace SICXE
 
             escribearchivointermedio(tabSim);
             escriberegistrosarchivo();
+            
+            tabSim.Clear();
+            archivointermedio.Clear();
+            formatos.Clear();
+            modosdir.Clear();
+            lang1.Clear();
+            lang2.Clear();
+            numlinea.Clear();
+            colcp.Clear();
+            coletiq.Clear();
+            coloper.Clear();
+            colinstr.Clear();
+            colerr.Clear();
+            aux.Clear();
+            codObj.Clear();
 
         }
 
@@ -1940,6 +1959,10 @@ namespace SICXE
                 return false;
         }
 
+        private void registros_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
     #endregion
 

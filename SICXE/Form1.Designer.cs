@@ -50,10 +50,9 @@
             // 
             // analizar
             // 
-            this.analizar.Location = new System.Drawing.Point(56, 33);
-            this.analizar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.analizar.Location = new System.Drawing.Point(42, 27);
             this.analizar.Name = "analizar";
-            this.analizar.Size = new System.Drawing.Size(100, 28);
+            this.analizar.Size = new System.Drawing.Size(75, 23);
             this.analizar.TabIndex = 0;
             this.analizar.Text = "ANALIZAR";
             this.analizar.UseVisualStyleBackColor = true;
@@ -65,10 +64,9 @@
             this.dt_TabSim.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.SIMBOLO,
             this.DIRECCION});
-            this.dt_TabSim.Location = new System.Drawing.Point(1163, 69);
-            this.dt_TabSim.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dt_TabSim.Location = new System.Drawing.Point(872, 56);
             this.dt_TabSim.Name = "dt_TabSim";
-            this.dt_TabSim.Size = new System.Drawing.Size(329, 185);
+            this.dt_TabSim.Size = new System.Drawing.Size(247, 150);
             this.dt_TabSim.TabIndex = 1;
             // 
             // SIMBOLO
@@ -94,10 +92,9 @@
             this.MOD,
             this.CODOP,
             this.ERRORES});
-            this.dtg_archIn.Location = new System.Drawing.Point(56, 69);
-            this.dtg_archIn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtg_archIn.Location = new System.Drawing.Point(42, 56);
             this.dtg_archIn.Name = "dtg_archIn";
-            this.dtg_archIn.Size = new System.Drawing.Size(1097, 569);
+            this.dtg_archIn.Size = new System.Drawing.Size(823, 462);
             this.dtg_archIn.TabIndex = 3;
             // 
             // Linea
@@ -157,34 +154,31 @@
             // Tam
             // 
             this.Tam.AutoSize = true;
-            this.Tam.Location = new System.Drawing.Point(1161, 304);
-            this.Tam.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.Tam.Location = new System.Drawing.Point(871, 247);
             this.Tam.Name = "Tam";
-            this.Tam.Size = new System.Drawing.Size(0, 17);
+            this.Tam.Size = new System.Drawing.Size(0, 13);
             this.Tam.TabIndex = 4;
             // 
             // registros
             // 
             this.registros.FormattingEnabled = true;
-            this.registros.ItemHeight = 16;
-            this.registros.Location = new System.Drawing.Point(1165, 338);
-            this.registros.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.registros.Location = new System.Drawing.Point(874, 275);
             this.registros.Name = "registros";
-            this.registros.Size = new System.Drawing.Size(328, 292);
+            this.registros.Size = new System.Drawing.Size(247, 238);
             this.registros.TabIndex = 5;
+            this.registros.SelectedIndexChanged += new System.EventHandler(this.registros_SelectedIndexChanged);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1511, 689);
+            this.ClientSize = new System.Drawing.Size(1133, 560);
             this.Controls.Add(this.registros);
             this.Controls.Add(this.Tam);
             this.Controls.Add(this.dtg_archIn);
             this.Controls.Add(this.dt_TabSim);
             this.Controls.Add(this.analizar);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "ANALIZADOR";
             ((System.ComponentModel.ISupportInitialize)(this.dt_TabSim)).EndInit();

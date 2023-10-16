@@ -319,10 +319,9 @@ namespace SICXE
 
         private void saveToolStripButton_Click(object sender, EventArgs e)
         {
-            // Usa una expresión regular para eliminar los comentarios
             string textoSinComentarios = Regex.Replace(textorichtextbox, @"/\*.*?\*/", "", RegexOptions.Singleline);
-            // Separa el texto en líneas y guárdalo en una lista
             List<string> lineas = textoSinComentarios.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
             if (tabControl1 != null && tabControl1.TabPages.Count == 1)
             {
                 Form childForm = new Form();
@@ -332,26 +331,17 @@ namespace SICXE
                 childForm.MdiParent = this;
                 TabPage tabPage2 = new TabPage("ENSAMBLADOR");
                 tabControl1.TabPages.Add(tabPage2);
-                
 
                 if (lineas.Count > 0)
                 {
                     Form1 form1 = new Form1(lineas);
-
-                    // Encuentra la segunda pestaña en el TabControl (0 para la primera, 1 para la segunda, etc.)
-                    TabPage secondTabPage = tabControl1.TabPages[1];
-
-                    form1.TopLevel = false; // Esto permite que el formulario se convierta en un control
+                    form1.TopLevel = false;
                     form1.FormBorderStyle = FormBorderStyle.None;
-
-                    secondTabPage.Controls.Add(form1);
-
+                    tabPage2.Controls.Add(form1);
                     form1.Dock = DockStyle.Fill;
-                    
                     form1.Show();
                     calculo = 1;
                     lineas.Clear();
-                    
                 }
                 else
                 {
@@ -374,26 +364,25 @@ namespace SICXE
                         }
                     }
 
+                    // Si existe una instancia de Form1, la elimína antes de crear una nueva
+                    if (form1 != null)
+                    {
+                        form1.Dispose();
+                    }
 
-                        // Si no existe una instancia de Form1, crea una nueva
-                        form1 = new Form1(lineas);
-                        form1.TopLevel = false;
-                        form1.FormBorderStyle = FormBorderStyle.None;
-                        tabControl1.TabPages[1].Controls.Add(form1);
-                        form1.Dock = DockStyle.Fill;
-                        form1.Show();
-                    
+                    form1 = new Form1(lineas);
+                    form1.TopLevel = false;
+                    form1.FormBorderStyle = FormBorderStyle.None;
+                    tabControl1.TabPages[1].Controls.Add(form1);
+                    form1.Dock = DockStyle.Fill;
+                    form1.Show();
 
                     calculo = 1;
                     lineas.Clear();
                 }
-
-
-
-
-
             }
         }
+
 
 
         private void pegarToolStripMenuItem_Click(object sender, EventArgs e)
