@@ -17,14 +17,13 @@ LINEA	FORM	CP	ETIQUETA   INSTR   OP		MOD	Codigo Objeto	Errores
 13              002D    TABLE      RESW    17                                                     
 14              0060    TABLE2     BYTE    C'TEST'                54455354                        
 15              0064               WORD    17                     000011                          
-16              0067               END     COUNT                              Error:Simbolo Duplicado
+16              0067               END     COUNT                                                  
 
 TABSIM
 
-LOOP	000F
-COUNT	0019
-TABLE	002D
-TABLE2	0060
+LOOP	COUNT	TABLE	TABLE2
+000F	0019	002D	0060
+A	A	A	A
 
 REGISTROS
 

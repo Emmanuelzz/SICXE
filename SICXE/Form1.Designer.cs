@@ -30,8 +30,6 @@
         {
             this.analizar = new System.Windows.Forms.Button();
             this.dt_TabSim = new System.Windows.Forms.DataGridView();
-            this.SIMBOLO = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DIRECCION = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dtg_archIn = new System.Windows.Forms.DataGridView();
             this.Linea = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Formato = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -44,6 +42,9 @@
             this.ERRORES = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Tam = new System.Windows.Forms.Label();
             this.registros = new System.Windows.Forms.ListBox();
+            this.SIMBOLO = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DIRECCION = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TIPO = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dt_TabSim)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtg_archIn)).BeginInit();
             this.SuspendLayout();
@@ -63,21 +64,12 @@
             this.dt_TabSim.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dt_TabSim.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.SIMBOLO,
-            this.DIRECCION});
+            this.DIRECCION,
+            this.TIPO});
             this.dt_TabSim.Location = new System.Drawing.Point(872, 56);
             this.dt_TabSim.Name = "dt_TabSim";
-            this.dt_TabSim.Size = new System.Drawing.Size(247, 150);
+            this.dt_TabSim.Size = new System.Drawing.Size(299, 150);
             this.dt_TabSim.TabIndex = 1;
-            // 
-            // SIMBOLO
-            // 
-            this.SIMBOLO.HeaderText = "SIMBOLO";
-            this.SIMBOLO.Name = "SIMBOLO";
-            // 
-            // DIRECCION
-            // 
-            this.DIRECCION.HeaderText = "DIRECCION";
-            this.DIRECCION.Name = "DIRECCION";
             // 
             // dtg_archIn
             // 
@@ -166,14 +158,39 @@
             this.registros.Name = "registros";
             this.registros.Size = new System.Drawing.Size(247, 238);
             this.registros.TabIndex = 5;
-            this.registros.SelectedIndexChanged += new System.EventHandler(this.registros_SelectedIndexChanged);
+            // 
+            // SIMBOLO
+            // 
+            this.SIMBOLO.HeaderText = "SIMBOLO";
+            this.SIMBOLO.Name = "SIMBOLO";
+            this.SIMBOLO.ReadOnly = true;
+            this.SIMBOLO.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            // 
+            // DIRECCION
+            // 
+            this.DIRECCION.HeaderText = "DIRECCION/VALOR";
+            this.DIRECCION.MaxInputLength = 100;
+            this.DIRECCION.Name = "DIRECCION";
+            this.DIRECCION.ReadOnly = true;
+            this.DIRECCION.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.DIRECCION.Width = 110;
+            // 
+            // TIPO
+            // 
+            this.TIPO.FillWeight = 50F;
+            this.TIPO.HeaderText = "TIPO";
+            this.TIPO.MaxInputLength = 10;
+            this.TIPO.Name = "TIPO";
+            this.TIPO.ReadOnly = true;
+            this.TIPO.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.TIPO.Width = 40;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1133, 560);
+            this.ClientSize = new System.Drawing.Size(1204, 560);
             this.Controls.Add(this.registros);
             this.Controls.Add(this.Tam);
             this.Controls.Add(this.dtg_archIn);
@@ -192,8 +209,6 @@
 
         private System.Windows.Forms.Button analizar;
         private System.Windows.Forms.DataGridView dt_TabSim;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SIMBOLO;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DIRECCION;
         private System.Windows.Forms.DataGridView dtg_archIn;
         private System.Windows.Forms.DataGridViewTextBoxColumn Linea;
         private System.Windows.Forms.DataGridViewTextBoxColumn Formato;
@@ -206,6 +221,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ERRORES;
         private System.Windows.Forms.Label Tam;
         private System.Windows.Forms.ListBox registros;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SIMBOLO;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DIRECCION;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TIPO;
     }
 }
 

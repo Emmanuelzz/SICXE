@@ -22,14 +22,24 @@ namespace SICXE
         string operando = "";
         string contP = "";
         string b = "-1";
-        string programaleido= "";
+        string programaleido = "";
         List<string> lineas;
+        List<string> errores = new List<string>();
+
+        construyearchintermedio archintermediocrea = new construyearchintermedio();
+
         public Form1(List<string> programasicxe)
         {
             InitializeComponent();
 
             lineas = programasicxe;
             analizaPrograma();
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+
         }
 
         private void analizaPrograma()
@@ -48,11 +58,12 @@ namespace SICXE
             List<List<string>> archivointermedio = new List<List<string>>();
             List<string> formatos = new List<string>();
             List<string> modosdir = new List<string>();
-            
+
 
             int contint = 0;
-            tabSim.Add(lang1);
-            tabSim.Add(lang2);
+            int simbolosentabsim = 0;
+            //tabSim.Add(lang1);
+            //tabSim.Add(lang2);
             archivointermedio.Add(numlinea);
             archivointermedio.Add(colcp);
             archivointermedio.Add(coletiq);
@@ -68,15 +79,15 @@ namespace SICXE
 
 
 
-            if (lineas.Count>0)
+            if (lineas.Count > 0)
             {
 
-               
-               codObj.Add("0000");
-               codObj.Add("");
 
-               foreach (string elemento in lineas)
-               {
+                codObj.Add("0000");
+                codObj.Add("");
+
+                foreach (string elemento in lineas)
+                {
                     line = elemento;
 
                     analizadorLSLexer lex = new analizadorLSLexer(new AntlrInputStream(line));
@@ -85,14 +96,14 @@ namespace SICXE
                     //CREAMOS LOS TOKENS SEGUN EL LEXER CREADO
                     analizadorLSParser parser = new analizadorLSParser(tokens);
                     //CREAMOS EL PARSER CON LOS TOKENS CREADOS
-                    var errorListener = new ErrorListener();
-                    parser.RemoveErrorListeners();
-                    parser.AddErrorListener(errorListener);
+
+
+
                     codObj[1] = "";//Se restable el valor del error para el siguiente calculo
 
                     string cp = codObj[0]; //obtiene el valor cp actual ya que cp apunta al siguiente
                                            //System.Console.WriteLine("Resultado linea:"+linea.ToString());
-                    
+
                     if (codObj[0] == "0000" && contint == 0)
                     {
                         formatos.Add("");
@@ -101,9 +112,24 @@ namespace SICXE
 
                     formatos.Add("");
                     modosdir.Add("");
-                    parser.programa(ref codObj, ref tabSim, ref formatos, ref reng, ref modosdir);//Parametros por referencia para el calculo del cp,errores y tabsim
-                                                                                                  //SE VERIFICA QUE EL ANALIZADOR EMPIECE CON LA EXPRESION
+
+                    
+                    var errorListener = new ErrorListener(errores);
+                    parser.RemoveErrorListeners();
+                    parser.AddErrorListener(errorListener);
+
+                    //CREAMOS ESPACIO EN LISTA DE ERRORES
+                    errores.Add("");
+
+                    
+                        parser.programa();//Parametros por referencia para el calculo del cp,errores y tabsim
+                                          //SE VERIFICA QUE EL ANALIZADOR EMPIECE CON LA EXPRESION
+
+
+                    #region CONSTRUYE LISTA DE ARCHIVO INTERMEDIO
+                    //SEPARA EXPRESION PARA OBTENER SUS ELEMENTOS E INGRESARLOS A LA LISTA DEL ARCHIVO INTERMEDIO
                     separaexpresion(line);
+
                     if (reng != 0)
                     {
                         List<string> nuevoRenglon = new List<string>();
@@ -173,48 +199,61 @@ namespace SICXE
                             archivointermedio[reng].Add(codObj[1].ToString());
                         }
                     }
-                    reng++;
+                    #endregion
 
 
-                    if (errorListener.Errors.Count > 0)
+                    string instractual = "";
+                    instractual = archivointermedio[reng][4].ToString();
+
+                    //SOLO SI ES DIFERENTE A START O END LA LINEA, VE A CALCULAR EL CP
+                    if (instractual != "START")
                     {
-                        //Console.WriteLine("Error linea:"+linea.ToString());
-                        foreach (var error in errorListener.Errors)
+                        //CALCULA CP
+                        archintermediocrea.calculaCP(archivointermedio, elemento, reng, formatos);
+                        //BUSCA MODO DE DIRECCIONAMIENTO
+                        if (archivointermedio[reng][1].ToString() != "")//VA A BUSCAR MODO DE DIRECCIONAMIENTO SI NO DIRECTIVA
                         {
-                            Console.WriteLine("Linea:" + linea.ToString() + " " + error);
-                            try
-                            {
-                                ce++;
-                                //Write a line of text
-
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine("Exception: " + ex.Message);
-                            }
+                            archintermediocrea.identificaMododir(archivointermedio, elemento, reng, modosdir);
+                        }
+                        //INSERTA SIMBOLO EN TABSIM
+                        if (archivointermedio[reng][3].ToString() != "")//SI TIENE SIMBOLO
+                        {
+                            archintermediocrea.añadeatabsim(archivointermedio, reng, tabSim, simbolosentabsim);
                         }
                     }
-                    linea++;
-               }
 
-                    t = "";
-                    //Se cargan los datos de la tabla de simbolos a dataGrid
-                    dt_TabSim.Rows.Clear();
-                    dt_TabSim.DataSource = null;
-                    dt_TabSim.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-                for (int i = 0; i < tabSim[0].Count; i++)
-                {
-                    dt_TabSim.Rows.Add();
-                    for (int j = 0; j < tabSim.Count; j++)
-                    {
-                        dt_TabSim.Rows[i].Cells[j].Value = tabSim[j][i];
-                        t += tabSim[j][i] + "\t";
-                    }
-                  
-                    t = "";
+                    archivointermedio[reng][8] = errores[reng];
+
+
+                    reng++;
+
+                    linea++;
 
 
                 }
+
+
+                #region CONSTRUYE EL DATAGRID DE TABSIM
+                // MUESTRA LA TABSIM
+                t = "";
+
+                // Se cargan los datos de la tabla de simbolos en el DataGridView
+                dt_TabSim.Rows.Clear();
+                dt_TabSim.DataSource = null;
+                dt_TabSim.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+                dt_TabSim.AllowUserToAddRows = false;
+
+                for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                {
+                    dt_TabSim.Rows.Add();
+
+                    for (int j = 0; j < tabSim[i].Count; j++) // Itera a través de los elementos de cada sublista
+                    {
+                        dt_TabSim.Rows[i].Cells[j].Value = tabSim[i][j];
+                        t += tabSim[i][j] + "\t";
+                    }
+                }
+                #endregion
 
             }
             else
@@ -224,9 +263,8 @@ namespace SICXE
             }
             #endregion
 
-
             #region paso dos
-   
+
             for (int i = 0; i < archivointermedio.Count; i++)
             {
                 if (archivointermedio[i].Count != 0)
@@ -240,7 +278,7 @@ namespace SICXE
             dtg_archIn.Rows.Clear();
             dtg_archIn.DataSource = null;
             dtg_archIn.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            dtg_archIn.AllowUserToAddRows=false;
+            dtg_archIn.AllowUserToAddRows = false;
             for (int i = 0; i < archivointermedio.Count; i++)
             {
                 if (archivointermedio[i].Count != 0)
@@ -272,6 +310,8 @@ namespace SICXE
             int contador = 0;
             bool bandera = true;
             int index = 0;
+            int indexext = 0;
+            int indexint = 0;
             string tem = "";
             List<string> relocalizables = new List<string>();//lista para el majo de todos los registros M
             List<string> codobjetosregistros = new List<string>();
@@ -348,22 +388,43 @@ namespace SICXE
             {
                 registros.Items.Add("E" + "00" + primIn);
             }
-            else if (tabSim[0].IndexOf(archivointermedio[index][5]) >= 0)
+            else 
             {//si la op esta en tabsim toma el valor
-                index = tabSim[0].IndexOf(archivointermedio[index][5]);
-                registros.Items.Add("E" + "00" + tabSim[1][index]);
+                string elementoABuscar = archivointermedio[index][5];
+                int index2 = -1;
+
+                for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                {
+                    index = tabSim[i].IndexOf(elementoABuscar);
+                    if (index != -1)
+                    {
+                        index2 = 1;
+                        indexext = i;
+                        indexint = 1;
+                        break;
+                    }
+                }
+
+                if (index == -1)
+                {
+                    registros.Items.Add("EFFFFFF");
+                    archivointermedio[index][8] = "Error: Simbolo no encontrado en TabSim";
+                    dtg_archIn.Rows[index].Cells[8].Value = "Error: Simbolo no encontrado en TabSim";
+                }
+                else
+                {
+                    registros.Items.Add("E" + "00" + tabSim[indexext][indexint]);
+                }
             }
-            else //si no esta en tabsim
-            {
-                registros.Items.Add("EFFFFFF");
-                archivointermedio[index][8] = "Error: Simbolo no encontrado en TabSim";
-                dtg_archIn.Rows[index].Cells[8].Value = "Error: Simbolo no encontrado en TabSim";
-            }
+
             #endregion
 
+            #region ESCRIBE ARCHIVOS
             escribearchivointermedio(tabSim);
             escriberegistrosarchivo();
-            
+            #endregion
+
+            #region LIMPIA VALORES
             tabSim.Clear();
             archivointermedio.Clear();
             formatos.Clear();
@@ -378,8 +439,9 @@ namespace SICXE
             colerr.Clear();
             aux.Clear();
             codObj.Clear();
-
+            #endregion
         }
+
 
         #region ESCRIBE ARCHIVO INTERMEDIO
         private void escribearchivointermedio(List<List<string>> tabSim)
@@ -387,7 +449,7 @@ namespace SICXE
             string t = "";
             string path1 = Environment.CurrentDirectory;
             // Abre el archivo intermedio 
-            StreamWriter ArchInt2 = new StreamWriter(path1 + "\\archivoIntermedio.txt"); 
+            StreamWriter ArchInt2 = new StreamWriter(path1 + "\\archivoIntermedio.txt");
             ArchInt2.WriteLine("\t\t\tArchivo Intermedio\n");
             ArchInt2.WriteLine("LINEA\tFORM\tCP\tETIQUETA   INSTR   OP\t\tMOD\tCodigo Objeto\tErrores");
 
@@ -441,7 +503,7 @@ namespace SICXE
                 // Escribe la línea en el archivo intermedio
                 ArchInt2.WriteLine(formattedLine);
             }
-            
+
 
             // Agrega los datos de dt_TabSim al archivo intermedio
             ArchInt2.WriteLine("\nTABSIM\n");
@@ -470,7 +532,7 @@ namespace SICXE
             string path1 = Environment.CurrentDirectory;
             // Abre el archivo intermedio 
             StreamWriter reg = new StreamWriter(path1 + "\\registros.txt");
-         
+
             reg.WriteLine("\nREGISTROS\n");
             foreach (string elemento in registros.Items)
             {
@@ -483,356 +545,10 @@ namespace SICXE
         }
         #endregion
 
-        //ANALISIS A PARTIR DEL CLICK EN BOTON DE INTERFAZ
-        /*
-        private void analizar_Click(object sender, EventArgs e)
-        {
-            #region paso uno
-            List<string> lang1 = new List<string>();
-            List<string> lang2 = new List<string>();
-            List<string> numlinea = new List<string>();
-            List<string> colcp = new List<string>();
-            List<string> coletiq = new List<string>();
-            List<string> coloper = new List<string>();
-            List<string> colinstr = new List<string>();
-            List<string> colerr = new List<string>();
-            List<string> aux = new List<string>();
-            List<List<string>> tabSim = new List<List<string>>();//Lista para la tabla de simbolos
-            List<List<string>> archivointermedio = new List<List<string>>();
-            List<string> formatos = new List<string>();
-            List<string> modosdir = new List<string>();
-            int contint = 0;
-            tabSim.Add(lang1);
-            tabSim.Add(lang2);
-            archivointermedio.Add(numlinea);
-            archivointermedio.Add(colcp);
-            archivointermedio.Add(coletiq);
-            archivointermedio.Add(colinstr);
-            archivointermedio.Add(coloper);
-            archivointermedio.Add(colerr);
-            int linea = 0;
-            int ce = 0;
-            string t = "";
-            List<string> codObj = new List<string>();//Lista para el manejo del cp (codObj[0]) y errores (codObj[1])
-            String line;
-            int reng = 0;
-            // Crear un cuadro de diálogo de archivo para que el usuario seleccione un archivo de texto.
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            // Establecer la ruta predeterminada en el escritorio.
-            openFileDialog.InitialDirectory = Environment.CurrentDirectory;
-
-            openFileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Todos los archivos (*.*)|*.*";
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    string filePath = openFileDialog.FileName;
-                    try
-                    {
-                        string path = Environment.CurrentDirectory;
-                        //Pass the filepath and filename to the StreamWriter Constructor
-                        StreamWriter sw = new StreamWriter(path + "\\prueba.err");
-                        //Pass the file path and file name to the StreamReader constructor
-                        StreamReader sr = new StreamReader(filePath);
-                        //archivo intermedio
-                        StreamWriter archInt = new StreamWriter(path + "\\archivoIntermedio.txt");
-                        archInt.WriteLine("\t\t\tArchivo Intermedio\n");
-                        archInt.WriteLine("LINEA\tCP\t\t\t\tCodigo Objeto y/o Errores");
-                        codObj.Add("0000");
-                        codObj.Add("");
-                        //Read the first line of text
-                        line = sr.ReadLine();
-                        //Continue to read until you reach end of file
-                        while (line != null)
-                        {
-                            analizadorLSLexer lex = new analizadorLSLexer(new AntlrInputStream(line));
-                            //CREAMOS UN LEXER CON LA CADENA QUE ESCRIBIO EL USUARIO
-                            CommonTokenStream tokens = new CommonTokenStream(lex);
-                            //CREAMOS LOS TOKENS SEGUN EL LEXER CREADO
-                            analizadorLSParser parser = new analizadorLSParser(tokens);
-                            //CREAMOS EL PARSER CON LOS TOKENS CREADOS
-                            var errorListener = new ErrorListener();
-                            parser.RemoveErrorListeners();
-                            parser.AddErrorListener(errorListener);
-                            codObj[1] = "";//Se restable el valor del error para el siguiente calculo
-                            try
-                            {
-                                string cp = codObj[0]; //obtiene el valor cp actual ya que cp apunta al siguiente
-                                                       //System.Console.WriteLine("Resultado linea:"+linea.ToString());
-
-                                if (codObj[0] == "0000" && contint == 0)
-                                {
-                                    formatos.Add("");
-                                    contint = 1;
-                                }
-
-                                formatos.Add("");
-                                modosdir.Add("");
-                                parser.programa(ref codObj, ref tabSim, ref formatos, ref reng, ref modosdir);//Parametros por referencia para el calculo del cp,errores y tabsim
-                                                                                                              //SE VERIFICA QUE EL ANALIZADOR EMPIECE CON LA EXPRESION
-
-
-
-                                separaexpresion(line);
-                                if (reng != 0)
-                                {
-                                    List<string> nuevoRenglon = new List<string>();
-                                    archivointermedio.Add(nuevoRenglon);
-                                }
-                                if (etiqueta != "" && instruccion == "" && operando == null)
-                                {
-                                    instruccion = etiqueta;
-                                    etiqueta = "";
-                                }
-                                else
-                                {
-                                    if (etiqueta != "" && instruccion != "" && operando == null)
-                                    {
-                                        string auxins = instruccion;
-                                        instruccion = etiqueta;
-                                        operando = auxins;
-                                        etiqueta = "";
-                                    }
-                                    else
-                                    {
-                                        if (etiqueta != "" && instruccion == null)
-                                        {
-                                            instruccion = etiqueta;
-                                            etiqueta = "";
-                                            modosdir[reng] = "";
-                                        }
-                                    }
-                                }
-                                //ESCRIBIR RENGLON EN LISTA DE LISTAS
-                                for (int i = 0; i <= 8; i++)
-                                {
-                                    if (i == 0) {
-                                        archivointermedio[reng].Add(linea.ToString());
-                                    }
-                                    if (i == 1)
-                                    {
-                                        archivointermedio[reng].Add(formatos[reng]);
-                                    }
-                                    if (i == 2)
-                                    {
-                                        archivointermedio[reng].Add(cp);
-                                    }
-                                    if (i == 3)
-                                    {
-                                        archivointermedio[reng].Add(etiqueta);
-                                    }
-                                    if (i == 4)
-                                    {
-                                        archivointermedio[reng].Add(instruccion);
-                                    }
-                                    if (i == 5)
-                                    {
-                                        archivointermedio[reng].Add(operando);
-                                    }
-                                    if (i == 6)
-                                    {
-                                        archivointermedio[reng].Add(modosdir[reng]);
-                                    }
-                                    if (i == 7)
-                                    {
-                                        archivointermedio[reng].Add("");
-                                    }
-                                    if (i == 8)
-                                    {
-                                        archivointermedio[reng].Add(codObj[1].ToString());
-                                    }
-                                }
-                                reng++;
-                                //Se escribe en el archivo la linea que corresponde con los datos
-                                archInt.WriteLine(linea.ToString() + "\t" + cp + "\t" + etiqueta + "\t" + instruccion + "\t" + operando + "\t" + codObj[1].ToString());
-
-                                if (errorListener.Errors.Count > 0)
-                                {
-                                    //Console.WriteLine("Error linea:"+linea.ToString());
-                                    foreach (var error in errorListener.Errors)
-                                    {
-                                        Console.WriteLine("Linea:" + linea.ToString() + " " + error);
-                                        try
-                                        {
-                                            ce++;
-                                            //Write a line of text
-                                            sw.WriteLine("Linea:" + linea.ToString() + " " + error.ToString());
-
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.WriteLine("Exception: " + ex.Message);
-                                        }
-                                    }
-                                }
-                            }
-                            catch (RecognitionException ex)
-                            {
-                                Console.Error.WriteLine(ex.StackTrace);
-                            }
-                            //write the line to console window
-                            //Console.WriteLine(line);
-                            //Read the next line
-                            line = sr.ReadLine();
-                            linea++;
-
-                        }
-                        archInt.WriteLine("\nTABSIM\n");
-                        t = "";
-                        //Se cargan los datos de la tabla de simbolos a dataGrid
-                        dt_TabSim.Rows.Clear();
-                        dt_TabSim.DataSource = null;
-                        dt_TabSim.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-                        for (int i = 0; i < tabSim[0].Count; i++) {
-                            dt_TabSim.Rows.Add();
-                            for (int j = 0; j < tabSim.Count; j++) {
-                                dt_TabSim.Rows[i].Cells[j].Value = tabSim[j][i];
-                                t += tabSim[j][i] + "\t";
-                            }
-                            archInt.WriteLine(t);
-                            t = "";
-                        }
-
-                        //close the file
-                        sr.Close();
-                        sw.Close();
-                        archInt.Close();
-                        if (ce == 0)
-                            Console.WriteLine("#EJECUCION SIN ERRORES#");
-                        Console.Read();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Exception: " + ex.Message);
-                        Console.Read();
-                    }
-
-                }
-                catch (Exception ex) {
-                    MessageBox.Show($"Error al leer el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            #endregion
-
-            #region paso dos
-            for (int i = 0; i < archivointermedio.Count; i++)
-            {
-                if (archivointermedio[i].Count != 0)
-                {
-                    if (archivointermedio[i][4] != "END")
-                        contP = archivointermedio[i + 1][2];
-                    generaCodObj(archivointermedio[i], tabSim, contP, b);
-                }
-            }
-            Tam.Text = "Tamaño del programa:" + contP;
-            dtg_archIn.Rows.Clear();
-            dtg_archIn.DataSource = null;
-            dtg_archIn.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            for (int i = 0; i < archivointermedio.Count; i++)
-            {
-                if (archivointermedio[i].Count != 0)
-                {
-                    dtg_archIn.Rows.Add();
-                    for (int j = 0; j < archivointermedio[i].Count; j++)
-                    {
-                        dtg_archIn.Rows[i].Cells[j].Value = archivointermedio[i][j];
-
-                    }
-                }
-            }
-            dtg_archIn.AutoResizeColumns();
-            #endregion
-
-            #region registros
-            //registro H
-            string n = "";
-            string nombre = "";
-            string primIn = "";
-            int contador = 0;
-            bool bandera = true;
-            int index = 0;
-            string tem = "";
-            List<string> relocalizables = new List<string>();//lista para el majo de todos los registros M
-            nombre = registroH(archivointermedio[0][3]);//Toma el nombre del programa
-            registros.Items.Add("H" + nombre + "00" + archivointermedio[0][2] + "00" + contP);//se añade el registro H
-            n = "T";
-            foreach (List<string> list in archivointermedio) {//recorre toda la matriz del archivo intermedio 
-                                                               //para generar los archivos T y M
-                if (list.Count != 0)
-                {
-                    if (list[7] != "" && list[4] != "WORD" && list[4] != "BYTE" && primIn == "")//Toma la primera instruccion
-                    {
-                        primIn = list[2];
-                    }
-                    if (list[7] != "" && bandera)//Va generando el registro T
-                    {
-                        bandera = false;
-                        n += "00" + list[2];
-                        tem = list[7];
-                    }
-                    if (list[4] == "RESB" || list[4] == "RESW" || contador >= 31 || list[4] == "END")//Corta el archivo T
-                    {
-                        index = archivointermedio.IndexOf(list);
-                        n += contador.ToString("X2") + tem;
-                        if(tem!= archivointermedio[index - 1][7])
-                            n += "..." + archivointermedio[index - 1][7];
-                        registros.Items.Add(n);
-                        bandera = true;
-                        contador = 0;
-                        n = "T";
-                        tem = "";
-                    }
-                    if (list[7] != "")//aumenta el tamaño del registro T
-                    {
-                        if (list[7].Contains("*"))
-                            contador += list[7].Replace("*", "").Length / 2;
-                        else
-                            contador += list[7].Length / 2;
-                    }
-                    if (list[7] != "" && list[7].Contains("*"))//Añade un nuevo registro M
-                    {
-                        int val = Convert.ToInt16(list[2], 16);
-                        val++;
-                        string re = val.ToString("X6");
-                        relocalizables.Add("M" + re + "05" + "+" + nombre);
-                    }
-                    if (list[4] == "END")//Toma el indice de la etiqueta END
-                    {
-                        index = archivointermedio.IndexOf(list);
-                    }
-                }
-            }
-            foreach (string m in relocalizables) {//Recorre todos los registros M para añadirlos al archivo
-                registros.Items.Add(m);
-            }
-
-
-            if (archivointermedio[index][5]=="")// si la etiqueta end no tiene op
-            {
-                registros.Items.Add("E" +"00"+ primIn);
-            }
-            else if (tabSim[0].IndexOf(archivointermedio[index][5])>=0) {//si la op esta en tabsim toma el valor
-                index= tabSim[0].IndexOf(archivointermedio[index][5]);
-                registros.Items.Add("E" + "00"+ tabSim[1][index]);
-            }
-            else //si no esta en tabsim
-            {
-                registros.Items.Add("EFFFFFF");
-                archivointermedio[index][8] = "Error: Simbolo no encontrado en TabSim";
-                dtg_archIn.Rows[index].Cells[8].Value = "Error: Simbolo no encontrado en TabSim";
-            }
-            #endregion
-        }
-        */
-
-
-        #region CODIGO FUNCIONAL  
-
 
         #region GENERACION REGISTRO H
-        public string registroH(string n) {
+        public string registroH(string n)
+        {
             int tamaño = 0;
             if (n.Length >= 7)
                 n = n.Remove(6);
@@ -851,7 +567,8 @@ namespace SICXE
         #endregion
 
         #region GENERACION CODIGO OBJETO
-        public string generaCodObj(List<string> archIn, List<List<string>> tabSim, string cp,string b) {
+        public string generaCodObj(List<string> archIn, List<List<string>> tabSim, string cp, string b)
+        {
             string obj = "";
             string codop = "";
             string reg1 = "";
@@ -862,15 +579,18 @@ namespace SICXE
             string dir = "";
             string desp = "";
             int index = -1;
-            bool c=false;
-            bool m=false;
+            int indexext = 0;
+            int indexint = 0;
+            bool c = false;
+            bool m = false;
             string TA = "";
             int des = 0;
             int num1 = 0;
             int num2 = 0;
-            if (archIn[1] != ""&&!archIn[8].Contains("Sintaxis") && archIn[4]!="RSUB" && !archIn[8].Contains("Instruccion"))
+            if (archIn[1] != "" && archIn[8].ToString() != "ERROR DE SINTAXIS" && archIn[4] != "RSUB" && archIn[8].ToString() != "Instruccion no existe")
             {
-                switch (archIn[1]) {//identifica el formato 
+                switch (archIn[1])
+                {//identifica el formato 
                     case "1":
                         archIn[7] = formato1(archIn[4]);
                         break;
@@ -883,7 +603,8 @@ namespace SICXE
                             reg2 = registro(partes[1]);
                             if (codop != "" && reg1 != "" && reg2 != "")
                                 archIn[7] = codop + reg1 + reg2;
-                            else if (reg2 == "") {
+                            else if (reg2 == "")
+                            {
                                 num = Convert.ToInt32(partes[1]);
                                 num = num - 1;
                                 reg2 = num.ToString("X");
@@ -898,11 +619,12 @@ namespace SICXE
                         }
                         break;
                     case "3":
-                        switch (archIn[6]){
+                        switch (archIn[6])
+                        {
                             case "SIMPLE":
                                 codop = formato3(archIn[4]);
-                                num = Convert.ToInt32(codop,16);
-                                num =num+ 3;
+                                num = Convert.ToInt32(codop, 16);
+                                num = num + 3;
                                 codop = num.ToString("X2");
                                 obj += codop;
                                 if (archIn[5].Contains(","))
@@ -934,11 +656,24 @@ namespace SICXE
                                         }
                                         else if (m) //m,X
                                         {
-                                            index = tabSim[0].IndexOf(partes[0]);
+                                            string elementoABuscar = partes[0];
+                                            index = -1;
+
+                                            for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                            {
+                                                index = tabSim[i].IndexOf(elementoABuscar);
+                                                if (index != -1)
+                                                {
+                                                    index = 1;
+                                                    indexext = i;
+                                                    indexint = 1;
+                                                    break;
+                                                }
+                                            }
                                             if (index != -1) //si TA es un simolo en tabsim
                                             {
 
-                                                TA = tabSim[1][index];//Obtiene la direccion objetivo
+                                                TA = tabSim[indexext][indexint];//Obtiene la direccion objetivo
                                                 //relativo a cp o a la base
                                                 if (relativoCp(TA + "H", contP))//si es relativo al cp
                                                 {
@@ -1040,19 +775,22 @@ namespace SICXE
                                                 archIn[7] = obj;
                                             }
                                         }
-                                        else {
+                                        else
+                                        {
                                             obj += "EFFF";
                                             archIn[8] += " Error: Operando Fuera de Rango";
                                             archIn[7] = obj;
                                         }
                                     }
-                                    else {
+                                    else
+                                    {
                                         obj += "EFFF";
                                         archIn[8] += " Error: Modo de direccionamiento no existe";
                                         archIn[7] = obj;
                                     }
                                 }
-                                else { //Si no es indexado
+                                else
+                                { //Si no es indexado
                                     c = validaC(archIn[5]);
                                     m = validaM(archIn[5]);
                                     if (c)// c
@@ -1077,10 +815,23 @@ namespace SICXE
                                     }
                                     else if (m) //m
                                     {
-                                        index = tabSim[0].IndexOf(archIn[5]);
+                                        string elementoABuscar = archIn[5];
+                                        index = -1;
+
+                                        for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                        {
+                                            index = tabSim[i].IndexOf(elementoABuscar);
+                                            if (index != -1)
+                                            {
+                                                index = 1;
+                                                indexext = i;
+                                                indexint = 1;
+                                                break;
+                                            }
+                                        }
                                         if (index != -1) //si TA es un simolo en tabsim
                                         {
-                                            TA = tabSim[1][index];//Obtiene la direccion objetivo
+                                            TA = tabSim[indexext][indexint];//Obtiene la direccion objetivo
                                             //relativo a cp o a la base
                                             if (relativoCp(TA + "H", contP))//si es relativo al cp
                                             {
@@ -1184,7 +935,8 @@ namespace SICXE
                                             archIn[7] = obj;
                                         }
                                     }
-                                    else {
+                                    else
+                                    {
                                         obj += "6FFF";
                                         archIn[8] += " Error: Operando Fuera de Rango";
                                         archIn[7] = obj;
@@ -1192,13 +944,13 @@ namespace SICXE
                                 }
                                 break;
                             case "INMEDIATO":
-                                codop = formato3(archIn[4].Replace("+",""));
+                                codop = formato3(archIn[4].Replace("+", ""));
                                 num = Convert.ToInt32(codop, 16);
                                 num = num + 1;
                                 codop = num.ToString("X2");
                                 obj += codop;
-                                c = validaC(archIn[5].Replace("#",""));
-                                m = validaM(archIn[5].Replace("#",""));
+                                c = validaC(archIn[5].Replace("#", ""));
+                                m = validaM(archIn[5].Replace("#", ""));
                                 if (c)// #c
                                 {
                                     obj += "0";
@@ -1222,11 +974,24 @@ namespace SICXE
                                 }
                                 else if (m) //#m
                                 {
-                                    index = tabSim[0].IndexOf(archIn[5].Replace("#", ""));
+                                    string elementoABuscar = archIn[5].Replace("#", "");
+                                    index = -1;
+
+                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                    {
+                                        index = tabSim[i].IndexOf(elementoABuscar);
+                                        if (index != -1)
+                                        {
+                                            index = 1;
+                                            indexext = i;
+                                            indexint = 1;
+                                            break;
+                                        }
+                                    }
                                     if (index != -1) //Si es un simbolo en tabsim
                                     {
-                                        TA = tabSim[1][index];//Obtiene la direccion objetivo
-                                                              //relativo a cp o a la base
+                                        TA = tabSim[indexext][indexint];//Obtiene la direccion objetivo
+                                                                        //relativo a cp o a la base
                                         if (relativoCp(TA + "H", contP))//si es relativo al cp
                                         {
                                             num1 = Convert.ToInt32(TA, 16);
@@ -1329,7 +1094,8 @@ namespace SICXE
                                         archIn[7] = obj;
                                     }
                                 }
-                                else {
+                                else
+                                {
                                     obj += "6FFF";
                                     archIn[8] += " Error: Operando Fuera de Rango";
                                     archIn[7] = obj;
@@ -1366,7 +1132,20 @@ namespace SICXE
                                 }
                                 else if (m) //m
                                 {
-                                    index = tabSim[0].IndexOf(archIn[5].Replace("@", ""));
+                                    string elementoABuscar = archIn[5].Replace("@", "");
+                                    index = -1;
+
+                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                    {
+                                        index = tabSim[i].IndexOf(elementoABuscar);
+                                        if (index != -1)
+                                        {
+                                            index = 1;
+                                            indexext = i;
+                                            indexint = 1;
+                                            break;
+                                        }
+                                    }
                                     if (index != -1) //Si es un simbolo en tabsim
                                     {
                                         TA = tabSim[1][index];//Obtiene la direccion objetivo
@@ -1439,7 +1218,8 @@ namespace SICXE
                                         archIn[7] = obj;
                                     }
                                 }
-                                else {
+                                else
+                                {
                                     obj += "6FFF";
                                     archIn[8] += " Error: Operando Fuera de Rango";
                                     archIn[7] = obj;
@@ -1451,7 +1231,7 @@ namespace SICXE
                         switch (archIn[6])
                         {
                             case "SIMPLE":
-                                codop = formato3(archIn[4].Replace("+",""));
+                                codop = formato3(archIn[4].Replace("+", ""));
                                 num = Convert.ToInt32(codop, 16);
                                 num = num + 3;
                                 codop = num.ToString("X2");
@@ -1464,11 +1244,24 @@ namespace SICXE
                                         m = validaM(partes[0]);
                                         if (m) //m,X
                                         {
-                                            index = tabSim[0].IndexOf(partes[0]);
+                                            string elementoABuscar = partes[0];
+                                            index = -1;
+
+                                            for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                            {
+                                                index = tabSim[i].IndexOf(elementoABuscar);
+                                                if (index != -1)
+                                                {
+                                                    index = 1;
+                                                    indexext = i;
+                                                    indexint = 1;
+                                                    break;
+                                                }
+                                            }
                                             if (index != -1) // Si es un simbolo en tabsim
                                             {
                                                 obj += "9";
-                                                dir = tabSim[1][index];
+                                                dir = tabSim[indexext][indexint];
                                                 num = Convert.ToInt32(dir, 16);
                                                 dir = num.ToString("X5");
                                                 obj += dir + "*";
@@ -1511,7 +1304,8 @@ namespace SICXE
                                         }
 
                                     }
-                                    else {
+                                    else
+                                    {
                                         obj += "FFFFFF";
                                         archIn[8] += " Error: Modo de direccionamiento no existe";
                                         archIn[7] = obj;
@@ -1522,14 +1316,27 @@ namespace SICXE
                                     m = validaM(archIn[5]);
                                     if (m)//m
                                     {
-                                        index = tabSim[0].IndexOf(archIn[5]);
+                                        string elementoABuscar = archIn[5];
+                                        index = -1;
+
+                                        for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                        {
+                                            index = tabSim[i].IndexOf(elementoABuscar);
+                                            if (index != -1)
+                                            {
+                                                index = 1;
+                                                indexext = i;
+                                                indexint = 1;
+                                                break;
+                                            }
+                                        }
                                         if (index != -1) //si es un simbolo en tabsim
                                         {
                                             obj += "1";
-                                            dir = tabSim[1][index];
+                                            dir = tabSim[indexext][indexint];
                                             num = Convert.ToInt32(dir, 16);
                                             dir = num.ToString("X5");
-                                            obj += dir+"*";
+                                            obj += dir + "*";
                                             archIn[7] = obj;
                                         }
                                         else if (valida(archIn[5])) //si es un valor mayor a 4095
@@ -1543,7 +1350,8 @@ namespace SICXE
                                                 obj += dir;
                                                 archIn[7] = obj;
                                             }
-                                            else {
+                                            else
+                                            {
                                                 obj += "1";
                                                 dir = archIn[5];
                                                 num = Convert.ToInt32(dir);
@@ -1573,20 +1381,33 @@ namespace SICXE
                                 num = num + 1;
                                 codop = num.ToString("X2");
                                 obj += codop;
-                                m = validaM(archIn[5].Replace("#",""));
+                                m = validaM(archIn[5].Replace("#", ""));
                                 if (m)//#m
                                 {
-                                    index = tabSim[0].IndexOf(archIn[5].Replace("#", ""));
+                                    string elementoABuscar = archIn[5].Replace("#", "");
+                                    index = -1;
+
+                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                    {
+                                        index = tabSim[i].IndexOf(elementoABuscar);
+                                        if (index != -1)
+                                        {
+                                            index = 1;
+                                            indexext = i;
+                                            indexint = 1;
+                                            break;
+                                        } 
+                                    }
                                     if (index != -1) //si es un simbolo en tabsim
                                     {
                                         obj += "1";
-                                        dir = tabSim[1][index];
+                                        dir = tabSim[indexext][indexint];
                                         num = Convert.ToInt32(dir, 16);
                                         dir = num.ToString("X5");
-                                        obj += dir+"*";
+                                        obj += dir + "*";
                                         archIn[7] = obj;
                                     }
-                                    else if (valida(archIn[5].Replace("#",""))) //si es un valor mayor a 4095
+                                    else if (valida(archIn[5].Replace("#", ""))) //si es un valor mayor a 4095
                                     {
                                         if (archIn[5].Contains("H"))//si esta en hexadecimal
                                         {
@@ -1598,7 +1419,8 @@ namespace SICXE
                                             obj += dir;
                                             archIn[7] = obj;
                                         }
-                                        else {// si esta en decimal
+                                        else
+                                        {// si esta en decimal
                                             obj += "1";
                                             dir = archIn[5].Replace("#", "");
                                             num = Convert.ToInt32(dir);
@@ -1630,17 +1452,31 @@ namespace SICXE
                                 m = validaM(archIn[5].Replace("@", ""));
                                 if (m)//m
                                 {
-                                    index = tabSim[0].IndexOf(archIn[5].Replace("@",""));
+                                    string elementoABuscar = archIn[5].Replace("@", "");
+                                    index = -1;
+
+                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                    {
+                                        index = tabSim[i].IndexOf(elementoABuscar);
+                                        if (index != -1)
+                                        {
+                                            index = 1;
+                                            indexext = i;
+                                            indexint = 1;
+                                            break;
+                                        }
+                                    }
+
                                     if (index != -1) //si es un simbolo en tabsim
                                     {
                                         obj += "1";
-                                        dir = tabSim[1][index];
+                                        dir = tabSim[indexext][indexint];
                                         num = Convert.ToInt32(dir, 16);
                                         dir = num.ToString("X5");
-                                        obj += dir+"*";
+                                        obj += dir + "*";
                                         archIn[7] = obj;
                                     }
-                                    else if (valida(archIn[5].Replace("@",""))) //si es un valor mayor a 4095
+                                    else if (valida(archIn[5].Replace("@", ""))) //si es un valor mayor a 4095
                                     {
                                         if (archIn[5].Contains("H"))//si esta en hexadecimal
                                         {
@@ -1652,7 +1488,8 @@ namespace SICXE
                                             obj += dir;
                                             archIn[7] = obj;
                                         }
-                                        else {//si esta en decimal
+                                        else
+                                        {//si esta en decimal
                                             obj += "1";
                                             dir = archIn[5].Replace("@", "");
                                             num = Convert.ToInt32(dir);
@@ -1679,8 +1516,10 @@ namespace SICXE
                         break;
                 }
             }
-            else if(archIn[4]!="START"&& archIn[4] != "BASE"&& archIn[4] != "END" && !archIn[8].Contains("Sintaxis") && archIn[4] != "RSUB" && !archIn[8].Contains("Instruccion")) {
-                switch (archIn[4]) {
+            else if (archIn[4] != "START" && archIn[4] != "BASE" && archIn[4] != "END" && !archIn[8].Contains("Sintaxis") && archIn[4] != "RSUB" && !archIn[8].Contains("Instruccion"))
+            {
+                switch (archIn[4])
+                {
                     case "WORD":
                         if (archIn[5].Contains("H")) //si es un valor en Hexadecimal
                         {
@@ -1689,7 +1528,8 @@ namespace SICXE
                             obj += num.ToString("X6");
                             archIn[7] = obj;
                         }
-                        else {//si es un valor en decimal
+                        else
+                        {//si es un valor en decimal
                             tem = archIn[5];
                             num = Convert.ToInt32(tem);
                             obj += num.ToString("X6");
@@ -1705,7 +1545,8 @@ namespace SICXE
                             obj += num.ToString("X6");
                             archIn[7] = obj;
                         }
-                        else if (archIn[5].Contains("C")) {//si es en caracteres
+                        else if (archIn[5].Contains("C"))
+                        {//si es en caracteres
                             tem = archIn[5].Replace("C", "");
                             tem = tem.Replace("'", "");
                             byte[] ASCIIvalues = Encoding.ASCII.GetBytes(tem);
@@ -1718,14 +1559,15 @@ namespace SICXE
                         break;
                 }
             }
-            else if (archIn[4] == "BASE" && !archIn[8].Contains("Sintaxis") && archIn[4] != "RSUB" && !archIn[8].Contains("Instruccion"))
+            else if (archIn[4] == "BASE" && !archIn[8].Contains("ERROR DE SINTAXIS") && archIn[4] != "RSUB" && !archIn[8].Contains("Instruccion no existe"))
             {
                 index = tabSim[0].IndexOf(archIn[5]);
                 if (index != -1) //si es un simbolo en tabsim
                 {
                     b = tabSim[1][index];
                 }
-                else if (archIn[5].Contains("H")) { //si es un valor en hexadecimal
+                else if (archIn[5].Contains("H"))
+                { //si es un valor en hexadecimal
                     tem = archIn[5].Replace("H", "");
                     num = Convert.ToInt32(tem, 16);
                     b = num.ToString("X4");
@@ -1741,10 +1583,11 @@ namespace SICXE
         #endregion
 
 
+
         #region METODOS UTILES Y VALIDACIONES
         public void separaexpresion(string s)
         {
-            
+
             string[] partes = s.Split(' '); // Dividir la cadena en partes usando espacios en blanco
                                             //string form = formatos[formatos.Count];
             Array.Resize(ref partes, partes.Length + 2);
@@ -1758,7 +1601,8 @@ namespace SICXE
 
         }
 
-        public string formato1(string s) {
+        public string formato1(string s)
+        {
             string codop = "";
             if (s == "HIO")
                 codop = "F4";
@@ -1796,7 +1640,8 @@ namespace SICXE
             return codop;
         }
 
-        public string registro(string s) {
+        public string registro(string s)
+        {
             string reg = "";
             if (s == "A")
                 reg = "0";
@@ -1813,19 +1658,22 @@ namespace SICXE
             return reg;
         }
 
-        public bool validaC(string s) {
+        public bool validaC(string s)
+        {
             int num = -1;
             if (s.Contains("H"))
             {
                 s = s.Replace("H", "");
-                num = Convert.ToInt32(s,16);
+                num = Convert.ToInt32(s, 16);
             }
             else
             {
-                try {
+                try
+                {
                     num = Convert.ToInt32(s);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     return false;
                 }
             }
@@ -1852,7 +1700,8 @@ namespace SICXE
                     return true;
                 }
             }
-            else {
+            else
+            {
                 try
                 {
                     num = Convert.ToInt32(s);
@@ -1867,7 +1716,8 @@ namespace SICXE
             return true;
         }
 
-        public bool valida(string s) {
+        public bool valida(string s)
+        {
             string tem = "";
             int num = 0;
             if (s.Contains("H"))
@@ -1886,7 +1736,8 @@ namespace SICXE
                 else
                     return false;
             }
-            else {
+            else
+            {
                 try
                 {
                     num = Convert.ToInt32(s);
@@ -1902,7 +1753,8 @@ namespace SICXE
             }
 
         }
-        public string hexaBin(string hex) {
+        public string hexaBin(string hex)
+        {
             // Convierte el valor hexadecimal a un valor entero
             int valorEntero = Convert.ToInt32(hex, 16);
 
@@ -1912,7 +1764,8 @@ namespace SICXE
             return valorBinario;
         }
 
-        public bool relativoCp(string TA, string contP) {
+        public bool relativoCp(string TA, string contP)
+        {
             int desp = 0;
             int num1 = 0;
             int num2 = 0;
@@ -1920,8 +1773,9 @@ namespace SICXE
             {
                 TA = TA.Replace("H", "");
                 num1 = Convert.ToInt32(TA, 16);
-            }else
-                num1=Convert.ToInt32(TA);
+            }
+            else
+                num1 = Convert.ToInt32(TA);
 
             num2 = Convert.ToInt32(contP, 16);
             desp = num1 - num2;
@@ -1931,7 +1785,8 @@ namespace SICXE
                 return false;
         }
 
-        public bool relativoBase(string TA) {
+        public bool relativoBase(string TA)
+        {
             if (b != "")
             {
                 int desp = 0;
@@ -1959,20 +1814,47 @@ namespace SICXE
                 return false;
         }
 
-        private void registros_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
-        }
+        /*
+        public void indentificaError(string l)
+        {
+            string[] t = l.Split(' ');
+
+            if (t.Length > 2)
+            {
+                if (instrucciones.Contains(t[1]) | directivas.Contains(t[1]))
+                {
+                    this.codObj[1] = "Error:Sintaxis";
+                }
+                else
+                    this.codObj[1] = "Error:Instruccion no existe";
+            }
+            else
+            {
+                if (instrucciones.Contains(t[0]) | directivas.Contains(t[0]))
+                {
+                    this.codObj[1] = "Error:Sintaxis";
+                }
+                else
+                    this.codObj[1] = "Error:Instruccion no existe";
+
+            }
+        }*/
     }
     #endregion
 
-    #endregion
 
-
+    
     #region MANEJADOR ERRORES
-    public class ErrorListener : BaseErrorListener 
+    public class ErrorListener : BaseErrorListener
     {
-        public List<string> Errors { get; } = new List<string>();
+        private List<string> errores;
+
+        public ErrorListener(List<string> errores)
+        {
+            this.errores = errores;
+            //errores.Add("LEXICO");
+        }
 
         public override void SyntaxError(
             IRecognizer recognizer,
@@ -1984,9 +1866,22 @@ namespace SICXE
             RecognitionException e)
         {
             string error = $"Error en línea {line}:{charPositionInLine} - {msg}";
-            Errors.Add(error);
+            if (charPositionInLine<=5)
+            {
+                    errores[errores.Count - 1] = "Instruccion no existe";
+                
+            }
+            else
+            {
+
+                errores[errores.Count - 1] = "ERROR DE SINTAXIS";
+                
+            }
         }
     }
     #endregion
+    
+
+
 
 }

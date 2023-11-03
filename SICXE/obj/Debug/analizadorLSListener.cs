@@ -120,6 +120,17 @@ public interface IanalizadorLSListener : IParseTreeListener {
 	void ExitOpvalor([NotNull] analizadorLSParser.OpvalorContext context);
 
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="analizadorLSParser.expresion"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterExpresion([NotNull] analizadorLSParser.ExpresionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="analizadorLSParser.expresion"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitExpresion([NotNull] analizadorLSParser.ExpresionContext context);
+
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="analizadorLSParser.fin"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

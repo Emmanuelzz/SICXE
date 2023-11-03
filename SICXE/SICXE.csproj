@@ -58,6 +58,7 @@
     <Compile Include="analizadorLS.g4.parser.cs">
       <DependentUpon>analizadorLS.g4</DependentUpon>
     </Compile>
+    <Compile Include="construyearchintermedio.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

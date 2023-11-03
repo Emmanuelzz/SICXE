@@ -89,6 +89,13 @@ public interface IanalizadorLSVisitor<Result> : IParseTreeVisitor<Result> {
 	Result VisitOpvalor([NotNull] analizadorLSParser.OpvalorContext context);
 
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="analizadorLSParser.expresion"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitExpresion([NotNull] analizadorLSParser.ExpresionContext context);
+
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="analizadorLSParser.fin"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

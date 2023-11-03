@@ -140,6 +140,19 @@ public partial class analizadorLSBaseListener : IanalizadorLSListener {
 	public virtual void ExitOpvalor([NotNull] analizadorLSParser.OpvalorContext context) { }
 
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="analizadorLSParser.expresion"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterExpresion([NotNull] analizadorLSParser.ExpresionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="analizadorLSParser.expresion"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitExpresion([NotNull] analizadorLSParser.ExpresionContext context) { }
+
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="analizadorLSParser.fin"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

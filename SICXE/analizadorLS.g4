@@ -38,11 +38,25 @@ tipodirectiva
 	:START '0'| START opvalor | BYTE opdirectiva
 	| WORD opvalor | RESB opvalor | RESW opvalor 
 	| BASE M | WORD NUM | RESB NUM | RESW NUM | WORD '0' 
-	|RESW '1'|RESW '0'|RESB '1'|RESB '0'|
+	|RESW '1'|RESW '0'|RESB '1'|RESB '0'| EQU expresion
 	;
 
 opvalor	:VALOR
 	;
+
+expresion 
+    : NUM
+    | etiqueta '*' expresion
+    | etiqueta '-' expresion
+    | etiqueta '/' expresion
+    | etiqueta '+' expresion
+    | '(' expresion ')'
+    | expresion '*' expresion
+    | expresion '-' expresion
+    | expresion '/' expresion
+    | expresion '+' expresion
+    ;
+
 
 	
 fin	
@@ -99,11 +113,12 @@ opdirectiva
 CODOPF1	:'FIX'|'FLOAT'|'HIO'|'NORM'|'SIO'|'TIO'	
 	;	
 	
-CODOPF2	:'ADDR'|'DIVR'|'MULR'|'RMO'|'SHIFTL'|'SHIFTR'
+CODOPF2	:'ADDR'|'CLEAR'|'COMPR'|'DIVR'|'MULR'|'RMO'|'SHIFTL'|'SHIFTR'|'SUBR'|'SVC'|'TIXR'
 	;
 
-CODOPF3	:'ADD'|'ADDF'|'AND'|'COMP'|'LDA'|'LDB'|'LDX'|'STA'
-	|'TIX'| 'JEQ' |'STL'|'JSUB'|'J'|'LDL'|'TD'|'RD'|'STCH'|'JLT'|'STX'|'LDCH'|'WD'
+CODOPF3	:'ADD'|'ADDF'|'AND'|'COMP'|'COMPF'|'DIV'|'DIVF'|'J'|'JEQ'|'JGT'|'JLT'|'JSUB'|'LDA'
+		 |'LDB'|'LDCH'|'LDF'|'LDL'|'LDS'|'LDT'|'LDX'|'LPS'|'MUL'|'MULF'|'OR'|'RD'|'RSUB'|'SSK'
+		 |'STA'|'STB'|'STCH'|'STF'|'STI'|'STL'|'STS'|'STSW'|'STT'|'STX'|'SUB'|'SUBF'|'TD'|'TIX'|'WD'
 	;
 	
 REG	:'A'|'X'|'L'|'B'|'S'|'T'|'F'
@@ -125,6 +140,9 @@ RESW	:'RESW'
 	;	
 
 BASE	:'BASE'
+	;
+
+EQU	:'EQU'
 	;
 
 END	:'END'
