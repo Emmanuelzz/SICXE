@@ -22,6 +22,12 @@ namespace SICXE
         string valu = "";
         string l = "";
         int simbolosreng = 0;
+        int simbolosreng2 = 0;
+        CalculoExpresiones calculoexpresiones = new CalculoExpresiones();
+        string tipoglobal = "";
+        List<string> cpstabsimexpr = new List<string>();
+        string resultadoevaluacion = "";
+        int vienedeexpr = 0;
 
         public construyearchintermedio()
         {
@@ -284,101 +290,335 @@ namespace SICXE
 
             bool simboloEncontrado = false;//VARIABLE PARA ENCONTRAR EL SIMBOLO EN TABSIM
             bool error = false;
+            //OBTEN LA EXPRESION
+            string expresion = archivointermedio[renglon][5].ToString();
+            cpstabsimexpr.Clear();//LIMPIA TABLA DE CPS
 
+            #region CASO EQU
             //SI EL SIMBOLO VIENE DE UNA INSTRUCCION EQU
-            if(archivointermedio[renglon][4].ToString()=="EQU")
+            if (archivointermedio[renglon][4].ToString() == "EQU")
             {
-                string expresion = archivointermedio[renglon][5].ToString();
-                error=identificaelementosexpresion(archivointermedio, renglon, tabsim, simbolosreng,simbolo,expresion);
-
-                if(error==true)//ERROR EXPRESION INVALIDA
+                //PRIMERO EVALUO SI EL OPERANDO NO SEA *
+                if (archivointermedio[renglon][5].ToString() == "*")//SI ES ASI ENTONCES ES RELATIVO
                 {
-                    //---INSERTA SIMBOLO PERO CON FFFF COMO ERROR Y DE TIPO ABSOLUTO---
+                    insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "R");
+                }//si no es *, entonces si evalua
+                else
+                { 
+                //CONVIERTE EXPRESION A UN ARRAY PARA ANALIZAR SUS ELEMENTOS
+                string operadoresaignorar = @"[\(\)\+\-\*\/]";
+                string[] elementos = Regex.Split(expresion, operadoresaignorar);
 
+                #region UN SOLO ELEMENTO DE EXPRESION
+                //SI SOLAMENTE ES UN ELEMENTO EL QUE TIENE LA EXPRESION
+                if (elementos.Count() == 1)
+                {
+                    //ESTO LE QUITA LA H AL NUMERO PARA PODER VER SI ES NUMERO O NO
+                    string eliminarH = @"[H]";
+                    string elementoprevio = elementos[0];
+                    string[] indeterminado = Regex.Split(elementoprevio, eliminarH);
+                    string elemento = indeterminado[0];
+                    //y este es un numero
+                    if (EsNumero(elemento))
+                    {
+                        //y si no existe
+                        simboloEncontrado = buscatabsimsim(simbolo, simboloEncontrado, tabsim);
+                        if (!simboloEncontrado)
+                        {
+                            //insertalo en tabsim como absoluto
+
+                            tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
+                            simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
+                            string valor = "";
+                            valor = formateanumero(elemento);
+                            tabsim[simbolosreng - 1].Add(valor);//EL VALOR DEL NUMERO
+                            tabsim[simbolosreng - 1].Add("A");//Y EL TIPO DE LA EXPRESION
+                            return;//SALTE DE ESTE METODO
+                        }
+
+                    }
+                    else
+                    {
+                        //SI NO ES UN NUMERO, PUES ES UN SIMBOLO, POR LO QUE ANTES DE TOMAR
+                        //EL CP DEL SIMBOLO DE LA EXPRESION HAY QUE BUSCARLO
+                        simboloEncontrado = buscatabsimsim(elementoprevio, simboloEncontrado, tabsim);
+                        if (simboloEncontrado)//Si existe el simbolo de la expresion a insertar
+                        {
+                            //AHORA VAMOS A BUSCAR SI EL SIMBOLO A INSERTAR EXISTE YA EN TABSIM 
+                            simboloEncontrado = buscatabsimsim(simbolo, simboloEncontrado, tabsim);
+                            if (!simboloEncontrado)
+                            {
+                                //SI EXISTE, INSERTA SU CP JUNTO CON EL TIPO DEL SIMBOLO
+                                tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
+                                simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
+                                tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
+                                tabsim[simbolosreng - 1].Add(tabsim[simbolosreng2][1]);//EL VALOR DEL NUMERO
+                                string tipo = "";
+                                tipo = tabsim[simbolosreng2][2];
+                                tabsim[simbolosreng - 1].Add(tipo);//Y EL TIPO DE LA EXPRESION
+                                return;//SALTE DE ESTE METODO
+                            }
+                            else
+                            {
+                                //INSERTALO CON ERROR
+                                insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "E");
+                            }
+                        }
+                        else
+                        {
+                            //INSERTALO CON ERROR
+                            insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "E");
+                        }
+
+
+                    }
+
+                }
+                #endregion
+                else
+                {
+                    error = identificaelementosexpresion(archivointermedio, renglon, tabsim, simbolosreng, simbolo, elementos);
+                    
+                    if (error == true)//ERROR EXPRESION INVALIDA
+                    {
+                        //---INSERTA SIMBOLO PERO CON FFFF COMO ERROR Y DE TIPO ABSOLUTO---
+                        insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "E");
+                        return;
+                    }
+                    else
+                    {
+
+                                //List<string> soloElemento2 = tabsim.Select(sublista => sublista.ElementAtOrDefault(1)).ToList();
+                                string expresionalgebraica = "";
+                                expresionalgebraica=calculoexpresiones.SustituyeValoresExp(expresion,cpstabsimexpr);
+                                resultadoevaluacion = "";
+                                //OBTIENE EL RESULTADO DE LA EXPRESION
+                                resultadoevaluacion = calculoexpresiones.Evaluaexpresionalgebraica(expresionalgebraica);
+                                vienedeexpr = 1;
+                                insertaentabsim(archivointermedio, tabsim, simbolo, renglon, tipoglobal);
+                                return;
+                            
+
+                    }
+                }
+            }
+            }
+            #endregion
+            else
+            {
+                //SI ES UN AREA DE DATOS o una instruccion
+                insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "R");//ES RELATIVA
+            }
+
+        }
+        #endregion
+
+        #region OPERACIONES EN TABSIM
+
+        #region INSERTA EN TABSIM
+        public void insertaentabsim(List<List<string>> archivointermedio, List<List<string>> tabsim, string simbolo,int renglon,string tipo)
+        {
+            List<string> nuevoRenglon = new List<string>();
+            bool simboloEncontrado = false;
+            switch (tipo)
+            {
+                case "R":
+                    simboloEncontrado = buscatabsimsim(simbolo, simboloEncontrado, tabsim);
+                    if (!simboloEncontrado)
+                    {
+                        if (vienedeexpr == 1)
+                        {
+                            tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
+                            simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(resultadoevaluacion);//JUNTO CON SU CP
+                            tabsim[simbolosreng - 1].Add("R");//Y EL TIPO DE LA EXPRESION
+                            vienedeexpr = 0;
+                            break;
+                        }
+                        else
+                        {
+                            tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
+                            simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(archivointermedio[renglon][2]);//JUNTO CON SU CP
+                            tabsim[simbolosreng - 1].Add("R");//Y EL TIPO DE LA EXPRESION
+                            break;
+                        }
+
+                    }
+                    else
+                    {
+                        insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "E");
+                        break;
+                    }
+                    break;
+                case "A":
+                    simboloEncontrado = buscatabsimsim(simbolo, simboloEncontrado, tabsim);
+                    if (!simboloEncontrado)
+                    {
+                        if(vienedeexpr==1)
+                        {
+                            tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
+                            simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(resultadoevaluacion);//JUNTO CON SU CP
+                            tabsim[simbolosreng - 1].Add("A");//Y EL TIPO DE LA EXPRESION
+                            vienedeexpr = 0;
+                            break;
+                        }
+                        else
+                        {
+                            tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
+                            simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
+                            tabsim[simbolosreng - 1].Add(archivointermedio[renglon][2]);//JUNTO CON SU CP
+                            tabsim[simbolosreng - 1].Add("A");//Y EL TIPO DE LA EXPRESION
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        insertaentabsim(archivointermedio, tabsim, simbolo, renglon, "E");
+                        break;
+                    }
+                    break;
+                case "E":
                     tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
                     simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
                     tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
                     tabsim[simbolosreng - 1].Add("FFFF");//JUNTO CON SU CP
                     tabsim[simbolosreng - 1].Add("A");//Y EL TIPO DE LA EXPRESION
-                    archivointermedio[renglon][8] = "ERROR: Expresion invalida"; 
-                    return;
-                }
+                    archivointermedio[renglon][8] = "ERROR: Expresion invalida";
+                    break;
+  
             }
-
-                if (tabsim.Count > 0)//SI YA EXISTEN ELEMENTOS EN TABSIM...ENCUENTRALO PARA NO INSERTAR REPETIDO
-                {
-                    simboloEncontrado=buscatabsimsim(simbolo, simboloEncontrado, tabsim);
-                }
-                else
-                {
-                    if (!simboloEncontrado || tabsim.Count==0)//SI NO ESTÁ REPETIDO O NO EXISTE INSERTA EL INDICE
-                    {
-                        tabsim.Add(nuevoRenglon);//AÑADE UN NUEVO RENGLÓN
-                        simbolosreng++;//AUMENTA EL INDICE DEL RENGLÓN
-                        tabsim[simbolosreng - 1].Add(simbolo);//AÑADE EL SIMBOLO AL RENGLÓN
-                        tabsim[simbolosreng - 1].Add(archivointermedio[renglon][2]);//JUNTO CON SU CP
-                        tabsim[simbolosreng - 1].Add("A");//Y EL TIPO DE LA EXPRESION
-                        return;
-                    }
-                }
-                tabsim.Add(nuevoRenglon);
-                simbolosreng++;
-                tabsim[simbolosreng - 1].Add(simbolo);
-                tabsim[simbolosreng - 1].Add(archivointermedio[renglon][2]);
-                tabsim[simbolosreng - 1].Add("A");//Y EL TIPO DE LA EXPRESION
-
         }
         #endregion
 
+        #region BUSCA SIMBOLO EN TABSIM
         public bool buscatabsimsim(string simbolo,bool simboloEncontrado,List<List<string>> tabsim)
         {
+            /*
             foreach (List<string> sublista in tabsim)//VA A BUSCAR SIMBOLO EN TABSIM
             {
                 if (sublista[0] == simbolo)//SI LO ENCUENTRA
                 {
                     return simboloEncontrado = true;//AVISA QUE LO ENCONTRASTE
                 }
+            }*/
+            simbolosreng2 = 0;
+            for (int i = 0; i < tabsim.Count; i++)
+            {
+                if (tabsim[i][0] == simbolo)
+                {
+                    simbolosreng2 = i;
+                    return simboloEncontrado = true;//AVISA QUE LO ENCONTRASTE
+                }
             }
             simboloEncontrado = false;//SI DESPUES DE BUSCARLO NO REGRESAMOS, ENTONCES NO LO ENCONTRAMOS :´(
             return simboloEncontrado;
         }
+        #endregion
 
-            public bool identificaelementosexpresion(List<List<string>> archivointermedio, int renglon, List<List<string>> tabsim, int simbreng,string simbolo,string expresion)
-            {
+        #endregion
+
+        #region PREVIO A EXPRESION
+        public bool identificaelementosexpresion(List<List<string>> archivointermedio, int renglon, List<List<string>> tabsim, int simbreng,string simbolo, string[] elementos)
+        {
+            tipoglobal = "";
             bool simboloEncontrado = false;
-            string operadoresaignorar = @"[\(\)\+\-\*\/]";
-            string[] elementos = Regex.Split(expresion, operadoresaignorar);
             bool error = false;
             List<string> listaabsyrel = new List<string>();
+            bool eshexnum = false;
 
             foreach (string elemento in elementos)
             {
-                if (EsNumero(elemento))//SI ES UN NUMERO...
+                if (elemento != "")
                 {
-                    listaabsyrel.Add(elemento);
-                    listaabsyrel.Add("A");
-                }
-                else//SI ES UN SIMBOLO...
-                {
-                    if (tabsim.Count > 0)
+                    if (elemento.EndsWith("H") && elemento.Length > 1 && char.IsDigit(elemento[elemento.Length - 2]))
                     {
-                        simboloEncontrado = buscatabsimsim(simbolo, simboloEncontrado, tabsim);
+                        eshexnum = true;
                     }
-                    else//SI TABSIM ESTÁ VACIO, ENTONCES YA NO ANALICES MAS Y REGRESA ERROR
+                    if (EsNumero(elemento) || eshexnum==true)//SI ES UN NUMERO...
                     {
-                        return error = true;
+                        string numero = "";
+                        if (eshexnum != true)
+                        {
+                            numero = formateanumero(elemento);
+                            listaabsyrel.Add(numero);
+                        }
+                        else
+                        {
+                            listaabsyrel.Add(elemento);
+                        }
+                        listaabsyrel.Add("A");
+                        //cpstabsimexpr.Add("");//CREA UN ESPACIO EN BLANCO YA QUE NO HAY CP DE UN NUMERO XDDD
                     }
- 
+                    else//SI ES UN SIMBOLO...
+                    {
+                        if (tabsim.Count > 0)//SI YA HAY SIMBOLOS EN LA TABSIM
+                        {
+                            //Busca el simbolo que forma parte de la expresion en la tabsim
+                            simboloEncontrado = buscatabsimsim(elemento, simboloEncontrado, tabsim);
+                            if (simboloEncontrado)//SI LO ENCONTRAMOS
+                            {
+                                //OBTEN EL TIPO PARA INGRESARLO A LA LISTA DE TIPOS
+                                string tipo = "";
+                                tipo = tabsim[simbolosreng2][2].ToString();
+                                listaabsyrel.Add(elemento);
+                                listaabsyrel.Add(tipo);
+                                cpstabsimexpr.Add(tabsim[simbolosreng2][1].ToString());//ALIMENTA LA LISTA DE CPS QUE SE USAN EN LA EXPRESION
+                            }
+                            else//SI NO REGRESA ERROR, PORQUE QUIERE DECIR QUE EL SIMBOLO QUE FORMA PARTE DE LA EXPRESION NO EXISTE
+                            {
+                                return error = true;
+                            }
+                        }
+                        else//SI TABSIM ESTÁ VACIO, ENTONCES YA NO ANALICES MAS Y REGRESA ERROR
+                        {
+                            return error = true;
+                        }
+
+                    }
+                
                 }
             }
-            return error = false;
+            string exprecompleta = archivointermedio[renglon][5].ToString();
+            tipoglobal=calculoexpresiones.analizaexpresion(listaabsyrel,exprecompleta);
+                return error = false;
         }
+
 
         static bool EsNumero(string s)
         {
             double numero;
             return double.TryParse(s, out numero);//CONVIERTE LA CADENA EN UN NUMERO, SI TIENE EXITO DEVULEVE TRUE
         }
+
+        public string formateanumero(string valor)
+        {
+            if (valor.Contains("H"))
+            {
+                valor = valor.Replace("H", "");
+                int n = Convert.ToInt32(valor, 16);
+                string valorhex = "";
+
+                valorhex = n.ToString("X4");
+                return valorhex;
+            }
+            else
+            {
+                int n = Convert.ToInt32(valor);
+                string valordec = "";
+                valordec = n.ToString("X4");
+                return valordec;
+            }
+        }
+
+        #endregion
+
 
         #region BIBLIOTECAS DE INSTRUCCIONES Y DIRECTIVAS
 
@@ -424,6 +664,8 @@ namespace SICXE
             return evaluacion;
         }
         #endregion
+
+
 
         #region INSTRUCCIONES
 

@@ -69,6 +69,12 @@ C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\bin\Debu
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\bin\Debug\Antlr4.Runtime.dll
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\bin\Debug\Antlr4.Runtime.xml
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.csproj.CopyComplete
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesLexer.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesParser.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesListener.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesBaseListener.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesVisitor.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesBaseVisitor.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSLexer.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSParser.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSListener.cs
@@ -77,17 +83,17 @@ C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Soft
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSBaseVisitor.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.Antlr4GeneratedCodeFileListAbsolute.txt
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.Form1.resources
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.formularioref.resources
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.MAIN.resources
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.Properties.Resources.resources
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.GenerateResource.cache
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.CoreCompileInputs.cache
-C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.exe
-C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.pdb
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\bin\Debug\SICXE.exe.config
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\bin\Debug\SICXE.exe
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\bin\Debug\SICXE.pdb
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\bin\Debug\Antlr4.Runtime.dll
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\bin\Debug\MathParser.org-mXparser.dll
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\bin\Debug\Antlr4.Runtime.xml
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.CopyComplete
-C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.MAIN.resources
-C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.formularioref.resources
-C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.exe
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.pdb

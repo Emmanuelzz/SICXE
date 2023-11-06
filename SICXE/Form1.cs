@@ -97,8 +97,6 @@ namespace SICXE
                     analizadorLSParser parser = new analizadorLSParser(tokens);
                     //CREAMOS EL PARSER CON LOS TOKENS CREADOS
 
-
-
                     codObj[1] = "";//Se restable el valor del error para el siguiente calculo
 
                     string cp = codObj[0]; //obtiene el valor cp actual ya que cp apunta al siguiente
@@ -122,7 +120,7 @@ namespace SICXE
                     errores.Add("");
 
                     
-                        parser.programa();//Parametros por referencia para el calculo del cp,errores y tabsim
+                    parser.programa();//Parametros por referencia para el calculo del cp,errores y tabsim
                                           //SE VERIFICA QUE EL ANALIZADOR EMPIECE CON LA EXPRESION
 
 

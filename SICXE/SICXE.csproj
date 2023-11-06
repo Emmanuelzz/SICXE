@@ -39,6 +39,9 @@
     <Reference Include="Antlr4.Runtime, Version=4.6.0.0, Culture=neutral, PublicKeyToken=09abb75b9ed49849, processorArchitecture=MSIL">
       <HintPath>packages\Antlr4.Runtime.4.6.6\lib\net45\Antlr4.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="MathParser.org-mXparser, Version=5.2.1.0, Culture=neutral, PublicKeyToken=0fbab7add73ed6e2, processorArchitecture=MSIL">
+      <HintPath>packages\MathParser.org-mXparser.5.2.1\lib\net461\MathParser.org-mXparser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,12 +55,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalizadorExpresiones.g4.lexer.cs">
+      <DependentUpon>AnalizadorExpresiones.g4</DependentUpon>
+    </Compile>
+    <Compile Include="AnalizadorExpresiones.g4.parser.cs">
+      <DependentUpon>AnalizadorExpresiones.g4</DependentUpon>
+    </Compile>
     <Compile Include="analizadorLS.g4.lexer.cs">
       <DependentUpon>analizadorLS.g4</DependentUpon>
     </Compile>
     <Compile Include="analizadorLS.g4.parser.cs">
       <DependentUpon>analizadorLS.g4</DependentUpon>
     </Compile>
+    <Compile Include="CalculoExpresiones.cs" />
     <Compile Include="construyearchintermedio.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -65,6 +75,10 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Antlr4 Include="AnalizadorExpresiones.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>SICXE</CustomToolNamespace>
+    </Antlr4>
     <None Include="obj\Debug\analizadorLSBaseListener.cs" />
     <None Include="obj\Debug\analizadorLSBaseVisitor.cs" />
     <None Include="obj\Debug\analizadorLSLexer.cs" />
@@ -83,6 +97,12 @@
     <Compile Include="MAIN.Designer.cs">
       <DependentUpon>MAIN.cs</DependentUpon>
     </Compile>
+    <None Include="obj\Debug\AnalizadorExpresionesBaseListener.cs" />
+    <None Include="obj\Debug\AnalizadorExpresionesBaseVisitor.cs" />
+    <None Include="obj\Debug\AnalizadorExpresionesLexer.cs" />
+    <None Include="obj\Debug\AnalizadorExpresionesListener.cs" />
+    <None Include="obj\Debug\AnalizadorExpresionesParser.cs" />
+    <None Include="obj\Debug\AnalizadorExpresionesVisitor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

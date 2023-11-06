@@ -1,3 +1,9 @@
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesLexer.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesParser.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesListener.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesBaseListener.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesVisitor.cs
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\AnalizadorExpresionesBaseVisitor.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSLexer.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSParser.cs
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\analizadorLSListener.cs
