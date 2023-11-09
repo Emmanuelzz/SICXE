@@ -79,12 +79,12 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>SICXE</CustomToolNamespace>
     </Antlr4>
-    <None Include="obj\Debug\analizadorLSBaseListener.cs" />
-    <None Include="obj\Debug\analizadorLSBaseVisitor.cs" />
-    <None Include="obj\Debug\analizadorLSLexer.cs" />
-    <None Include="obj\Debug\analizadorLSListener.cs" />
-    <None Include="obj\Debug\analizadorLSParser.cs" />
-    <None Include="obj\Debug\analizadorLSVisitor.cs" />
+    <Compile Include="obj\Debug\analizadorLSBaseListener.cs" />
+    <Compile Include="obj\Debug\analizadorLSBaseVisitor.cs" />
+    <Compile Include="obj\Debug\analizadorLSLexer.cs" />
+    <Compile Include="obj\Debug\analizadorLSListener.cs" />
+    <Compile Include="obj\Debug\analizadorLSParser.cs" />
+    <Compile Include="obj\Debug\analizadorLSVisitor.cs" />
     <Compile Include="formularioref.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,12 +97,12 @@
     <Compile Include="MAIN.Designer.cs">
       <DependentUpon>MAIN.cs</DependentUpon>
     </Compile>
-    <None Include="obj\Debug\AnalizadorExpresionesBaseListener.cs" />
-    <None Include="obj\Debug\AnalizadorExpresionesBaseVisitor.cs" />
-    <None Include="obj\Debug\AnalizadorExpresionesLexer.cs" />
-    <None Include="obj\Debug\AnalizadorExpresionesListener.cs" />
-    <None Include="obj\Debug\AnalizadorExpresionesParser.cs" />
-    <None Include="obj\Debug\AnalizadorExpresionesVisitor.cs" />
+    <Compile Include="obj\Debug\AnalizadorExpresionesBaseListener.cs" />
+    <Compile Include="obj\Debug\AnalizadorExpresionesBaseVisitor.cs" />
+    <Compile Include="obj\Debug\AnalizadorExpresionesLexer.cs" />
+    <Compile Include="obj\Debug\AnalizadorExpresionesListener.cs" />
+    <Compile Include="obj\Debug\AnalizadorExpresionesParser.cs" />
+    <Compile Include="obj\Debug\AnalizadorExpresionesVisitor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

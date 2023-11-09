@@ -38,24 +38,41 @@ tipodirectiva
 	:START '0'| START opvalor | BYTE opdirectiva
 	| WORD opvalor | RESB opvalor | RESW opvalor 
 	| BASE M | WORD NUM | RESB NUM | RESW NUM | WORD '0' 
-	|RESW '1'|RESW '0'|RESB '1'|RESB '0'| EQU expresion
+	|RESW '1'|RESW '0'|RESB '1'|RESB '0'| EQU expresion | WORD expresion | ORG NUM | ORG opvalor
 	;
 
 opvalor	:VALOR
 	;
 
-expresion 
-    : NUM
-    | etiqueta '*' expresion
-    | etiqueta '-' expresion
-    | etiqueta '/' expresion
-    | etiqueta '+' expresion
-    | '(' expresion ')'
-    | expresion '*' expresion
-    | expresion '-' expresion
-    | expresion '/' expresion
-    | expresion '+' expresion
-    ;
+expresion 					
+	:	
+	multiplicacion(		
+	'+' multiplicacion				
+	|
+	'-' multiplicacion)*	
+	;
+	
+multiplicacion					
+	:	
+	numero(				
+	'*' numero		
+	|
+	'/' numero)*			
+	;
+numero							
+	:	
+	NUM		
+	|
+	'1'
+	|
+	etiqueta
+	|
+	'-'etiqueta
+	|
+	'(' expresion ')'
+	|
+	'*'			
+	;
 
 
 	
@@ -77,7 +94,7 @@ f1
 	
 f2
 	:CODOPF2 NUM | CODOPF2 REG ',' REG | CODOPF2 REG ',' NUM | CODOPF2 'X'',' REG 
-	| 'CLEAR' REG | CODOPF2 'X' |CODOPF2 'X' ',' NUM | 'TIXR' REG |CODOPF2 REG ',' 'X' 
+	| 'CLEAR' REG |'CLEAR' 'X' | CODOPF2 'X' |CODOPF2 'X' ',' NUM | 'TIXR' REG |CODOPF2 REG ',' 'X' 
 	| CODOPF2 NUM |CODOPF2 REG ',' NUM
 	;
 
@@ -89,15 +106,15 @@ f4
 	;
 	
 simple3
-	:CODOPF3 M | CODOPF3 NUM | CODOPF3 NUM ',' 'X' | CODOPF3 M ',' 'X' | 'RSUB'
+	:CODOPF3 M | CODOPF3 NUM | CODOPF3 NUM ',' 'X' | CODOPF3 M ',' 'X' | 'RSUB' | CODOPF3 expresion
 	;
 
 indirecto3
-	:CODOPF3 '@' NUM | CODOPF3 '@' M |CODOPF3 '@' opvalor
+	:CODOPF3 '@' NUM | CODOPF3 '@' M |CODOPF3 '@' opvalor | CODOPF3 '@' expresion
 	;
 	
 inmediato3
-	:CODOPF3 '#' NUM | CODOPF3 '#' M |CODOPF3 '#' opvalor
+	:CODOPF3 '#' NUM | CODOPF3 '#' M |CODOPF3 '#' opvalor | CODOPF3 '#' expresion
 	;
 
 opdirectiva
@@ -146,6 +163,9 @@ EQU	:'EQU'
 	;
 
 END	:'END'
+	;
+
+ORG :'ORG'
 	;
 	
 NUM	:('0'..'9')+

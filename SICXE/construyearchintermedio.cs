@@ -59,6 +59,7 @@ namespace SICXE
                     //SI ES UNA DIRECTIVA ORG
                     if (archivointermedio[renglon][4].ToString() == "ORG")
                     {
+                        cps.Add("");
                         //formatos[reng] = "RB";
                         string va = archivointermedio[renglon][5].ToString();
 
@@ -412,6 +413,44 @@ namespace SICXE
             }
 
         }
+
+        public string resExpre(List<List<string>> archivointermedio, int renglon, List<List<string>> tabsim, int simbreng)
+        {
+            string simbolo = archivointermedio[renglon][3].ToString();
+            List<string> nuevoRenglon = new List<string>();
+
+            bool error = false;
+            //OBTEN LA EXPRESION
+            string expresion = archivointermedio[renglon][5].ToString().Replace("@","").Replace("#","");
+            cpstabsimexpr.Clear();//LIMPIA TABLA DE CPS
+
+            //CONVIERTE EXPRESION A UN ARRAY PARA ANALIZAR SUS ELEMENTOS
+            string operadoresaignorar = @"[\(\)\+\-\*\/]";
+            string[] elementos = Regex.Split(expresion, operadoresaignorar);
+
+           
+            error = identificaelementosexpresion(archivointermedio, renglon, tabsim, simbolosreng, simbolo, elementos);
+
+            if (error == true)//ERROR EXPRESION INVALIDA
+            {
+                
+                return "FFFF,A,E";
+            }
+            else
+            {
+                string expresionalgebraica = "";
+                expresionalgebraica = calculoexpresiones.SustituyeValoresExp(expresion, cpstabsimexpr);
+                resultadoevaluacion = "";
+                //OBTIENE EL RESULTADO DE LA EXPRESION
+                resultadoevaluacion = calculoexpresiones.Evaluaexpresionalgebraica(expresionalgebraica);
+                vienedeexpr = 1;
+                return resultadoevaluacion+","+tipoglobal+",N";
+            }
+            
+
+        }
+
+
         #endregion
 
         #region OPERACIONES EN TABSIM
@@ -587,7 +626,9 @@ namespace SICXE
             }
             string exprecompleta = archivointermedio[renglon][5].ToString();
             tipoglobal=calculoexpresiones.analizaexpresion(listaabsyrel,exprecompleta);
-                return error = false;
+            if (tipoglobal == "E")
+                return error = true;
+            return error = false;
         }
 
 

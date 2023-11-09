@@ -22,8 +22,9 @@ namespace SICXE
         {
             string tipo = "";
             bool absoluto = false;
+            string patron = @"[+\-*/()]";
             //PRIMERO ANALIZAMOS SI TODOS SON ABSOLUTOS
-            absoluto=absolutos(listaabsyrel);
+            absoluto =absolutos(listaabsyrel);
             if (absoluto)
             {
                 return tipo="A";
@@ -33,12 +34,20 @@ namespace SICXE
             string expresionSimplificada = SimplificarExpresion(expresion);
             string expresionatomicatipos = SimplificarExpresionatomica(expresionSimplificada);
             int conteo = ContarRConSignoSuma(expresionatomicatipos);
-            if(conteo==1)
+            if (conteo == 1)
             {
                 tipo = "R";
             }
+            else
+            {
+                foreach (char c in Regex.Replace(expresionatomicatipos, patron, "")) {
+                    if (c != 'A')
+                        return "E";
+                }
+                tipo = "A";
+            }
             return tipo;
-
+            
         }
 
         public bool absolutos(List<string> listaabsyrel)
@@ -123,6 +132,7 @@ namespace SICXE
         {
             // CUENTA LA CANTIDAD DE RELATIVOS POSITIVOS
             MatchCollection matches = Regex.Matches(expresion, @"\+R");
+            matches = Regex.Matches(expresion, "(?<!-)(R)");
             return matches.Count;
         }
 

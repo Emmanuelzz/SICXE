@@ -30,6 +30,9 @@
         {
             this.analizar = new System.Windows.Forms.Button();
             this.dt_TabSim = new System.Windows.Forms.DataGridView();
+            this.SIMBOLO = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DIRECCION = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TIPO = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dtg_archIn = new System.Windows.Forms.DataGridView();
             this.Linea = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Formato = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -42,9 +45,6 @@
             this.ERRORES = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Tam = new System.Windows.Forms.Label();
             this.registros = new System.Windows.Forms.ListBox();
-            this.SIMBOLO = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DIRECCION = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TIPO = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dt_TabSim)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtg_archIn)).BeginInit();
             this.SuspendLayout();
@@ -70,6 +70,32 @@
             this.dt_TabSim.Name = "dt_TabSim";
             this.dt_TabSim.Size = new System.Drawing.Size(299, 150);
             this.dt_TabSim.TabIndex = 1;
+            // 
+            // SIMBOLO
+            // 
+            this.SIMBOLO.HeaderText = "SIMBOLO";
+            this.SIMBOLO.Name = "SIMBOLO";
+            this.SIMBOLO.ReadOnly = true;
+            this.SIMBOLO.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            // 
+            // DIRECCION
+            // 
+            this.DIRECCION.HeaderText = "DIRECCION/VALOR";
+            this.DIRECCION.MaxInputLength = 100;
+            this.DIRECCION.Name = "DIRECCION";
+            this.DIRECCION.ReadOnly = true;
+            this.DIRECCION.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.DIRECCION.Width = 110;
+            // 
+            // TIPO
+            // 
+            this.TIPO.FillWeight = 50F;
+            this.TIPO.HeaderText = "TIPO";
+            this.TIPO.MaxInputLength = 10;
+            this.TIPO.Name = "TIPO";
+            this.TIPO.ReadOnly = true;
+            this.TIPO.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.TIPO.Width = 40;
             // 
             // dtg_archIn
             // 
@@ -154,36 +180,12 @@
             // registros
             // 
             this.registros.FormattingEnabled = true;
+            this.registros.HorizontalScrollbar = true;
             this.registros.Location = new System.Drawing.Point(874, 275);
             this.registros.Name = "registros";
-            this.registros.Size = new System.Drawing.Size(247, 238);
+            this.registros.ScrollAlwaysVisible = true;
+            this.registros.Size = new System.Drawing.Size(297, 225);
             this.registros.TabIndex = 5;
-            // 
-            // SIMBOLO
-            // 
-            this.SIMBOLO.HeaderText = "SIMBOLO";
-            this.SIMBOLO.Name = "SIMBOLO";
-            this.SIMBOLO.ReadOnly = true;
-            this.SIMBOLO.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            // 
-            // DIRECCION
-            // 
-            this.DIRECCION.HeaderText = "DIRECCION/VALOR";
-            this.DIRECCION.MaxInputLength = 100;
-            this.DIRECCION.Name = "DIRECCION";
-            this.DIRECCION.ReadOnly = true;
-            this.DIRECCION.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.DIRECCION.Width = 110;
-            // 
-            // TIPO
-            // 
-            this.TIPO.FillWeight = 50F;
-            this.TIPO.HeaderText = "TIPO";
-            this.TIPO.MaxInputLength = 10;
-            this.TIPO.Name = "TIPO";
-            this.TIPO.ReadOnly = true;
-            this.TIPO.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.TIPO.Width = 40;
             // 
             // Form1
             // 

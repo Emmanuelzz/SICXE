@@ -226,7 +226,7 @@ namespace SICXE
         private void OpenFile(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory;
             openFileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Todos los archivos (*.*)|*.*";
 
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)

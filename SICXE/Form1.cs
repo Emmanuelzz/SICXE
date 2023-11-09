@@ -23,10 +23,13 @@ namespace SICXE
         string contP = "";
         string b = "-1";
         string programaleido = "";
+        bool ex;
+        string[] res = null;
         List<string> lineas;
         List<string> errores = new List<string>();
 
         construyearchintermedio archintermediocrea = new construyearchintermedio();
+        List<List<string>> archivointermedio = new List<List<string>>();
 
         public Form1(List<string> programasicxe)
         {
@@ -55,7 +58,7 @@ namespace SICXE
             List<string> colerr = new List<string>();
             List<string> aux = new List<string>();
             List<List<string>> tabSim = new List<List<string>>();//Lista para la tabla de simbolos
-            List<List<string>> archivointermedio = new List<List<string>>();
+            
             List<string> formatos = new List<string>();
             List<string> modosdir = new List<string>();
 
@@ -219,8 +222,8 @@ namespace SICXE
                             archintermediocrea.añadeatabsim(archivointermedio, reng, tabSim, simbolosentabsim);
                         }
                     }
-
-                    archivointermedio[reng][8] = errores[reng];
+                    if(archivointermedio[reng][4]!="ORG")
+                        archivointermedio[reng][8] += errores[reng];
 
 
                     reng++;
@@ -331,24 +334,29 @@ namespace SICXE
                         n += "00" + list[2];
                         tem = list[7];
                     }
-                    if (list[4] == "RESB" || list[4] == "RESW" || contador >= 31 || list[4] == "END")//Corta el archivo T
+                    if (list[4] == "RESB" || list[4] == "RESW" || list[4] == "ORG" || contador >= 31 || list[4] == "END")//Corta el archivo T
                     {
-                        index = archivointermedio.IndexOf(list);
-                        n += contador.ToString("X2") + tem;
-
-                        if (tem != archivointermedio[index - 1][7])
+                        if (contador != 0)
                         {
-                            if (codobjetosregistros.Count > 1)
+                            index = archivointermedio.IndexOf(list);
+                            if (tem.Contains("*"))
+                                tem = tem.Replace("*", "");
+                            n += contador.ToString("X2") + tem;
+
+                            if (tem != archivointermedio[index - 1][7])
                             {
-                                n += string.Join("", codobjetosregistros.Skip(1));
+                                if (codobjetosregistros.Count > 1)
+                                {
+                                    n += string.Join("", codobjetosregistros.Skip(1));
+                                }
                             }
+                            registros.Items.Add(n);
+                            bandera = true;
+                            contador = 0;
+                            n = "T";
+                            tem = "";
+                            codobjetosregistros.Clear();
                         }
-                        registros.Items.Add(n);
-                        bandera = true;
-                        contador = 0;
-                        n = "T";
-                        tem = "";
-                        codobjetosregistros.Clear();
                     }
                     if (list[7] != "")//aumenta el tamaño del registro T
                     {
@@ -365,10 +373,20 @@ namespace SICXE
                     }
                     if (list[7] != "" && list[7].Contains("*"))//Añade un nuevo registro M
                     {
-                        int val = Convert.ToInt16(list[2], 16);
-                        val++;
-                        string re = val.ToString("X6");
-                        relocalizables.Add("M" + re + "05" + "+" + nombre);
+                        int val=0;
+                        if (list[4] != "WORD")
+                        {
+                            val = Convert.ToInt16(list[2], 16);
+                            val++;
+                            string re = val.ToString("X6");
+                            relocalizables.Add("M" + re + "05" + "+" + nombre);
+                        }
+                        else
+                        {
+                            val = Convert.ToInt16(list[2], 16);
+                            string re = val.ToString("X6");
+                            relocalizables.Add("M" + re + "06" + "+" + nombre);
+                        }
                     }
                     if (list[4] == "END")//Toma el indice de la etiqueta END
                     {
@@ -630,8 +648,21 @@ namespace SICXE
                                     partes = archIn[5].Split(',');
                                     if (partes[partes.Length - 1] == "X")//SI ES INDEXADO
                                     {
-                                        c = validaC(partes[0]);
-                                        m = validaM(partes[0]);
+                                        if (!(partes[0].Contains("+") | partes[0].Contains("-") | partes[0].Contains("*") | partes[0].Contains("/") | partes[0].Contains("(") | partes[0].Contains(")")))
+                                        {
+                                            c = validaC(partes[0]);
+                                            m = validaM(partes[0]);
+                                        }
+                                        else
+                                        {
+                                            string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                            res = r.Split(',');
+                                            partes[0] = res[0]+"H";
+                                            c = validaC(partes[0]);
+                                            m = validaM(partes[0]);
+                                            if (res[2] == "E")
+                                                archIn[8] += "Error: Expresion";
+                                        }
                                         if (c)// c,X
                                         {
                                             obj += "8";
@@ -789,23 +820,49 @@ namespace SICXE
                                 }
                                 else
                                 { //Si no es indexado
-                                    c = validaC(archIn[5]);
-                                    m = validaM(archIn[5]);
+                               
+                                    if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
+                                    {
+                                        c = validaC(archIn[5]);
+                                        m = validaM(archIn[5]);
+                                        ex = false;
+                                    }
+                                    else
+                                    {
+                                        string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                        res = r.Split(',');
+                                        c = validaC(res[0]+"H");
+                                        m = validaM(res[0] +"H");
+                                        ex = true;
+                                        if (res[2] == "E")
+                                            archIn[8] += "Error: Expresion";
+                                    }
                                     if (c)// c
                                     {
                                         obj += "0";
-                                        if (archIn[5].Contains("H")) //si es un valor en hexadecimal
+                                        if (!ex)
                                         {
-                                            tem = archIn[5].Replace("H", "");
-                                            num = Convert.ToInt32(tem, 16);
-                                            desp = num.ToString("X3");
-                                            obj += desp;
-                                            archIn[7] = obj;
+                                            if (archIn[5].Contains("H")) //si es un valor en hexadecimal
+                                            {
+                                                tem = archIn[5].Replace("H", "");
+                                                num = Convert.ToInt32(tem, 16);
+                                                desp = num.ToString("X3");
+                                                obj += desp;
+                                                archIn[7] = obj;
+                                            }
+                                            else //si es un valor en decimal
+                                            {
+                                                tem = archIn[5];
+                                                num = Convert.ToInt32(tem);
+                                                desp = num.ToString("X3");
+                                                obj += desp;
+                                                archIn[7] = obj;
+                                            }
                                         }
-                                        else //si es un valor en decimal
+                                        else
                                         {
-                                            tem = archIn[5];
-                                            num = Convert.ToInt32(tem);
+                                            tem = res[0];
+                                            num = Convert.ToInt32(tem, 16);
                                             desp = num.ToString("X3");
                                             obj += desp;
                                             archIn[7] = obj;
@@ -813,7 +870,232 @@ namespace SICXE
                                     }
                                     else if (m) //m
                                     {
-                                        string elementoABuscar = archIn[5];
+                                        if (!ex)
+                                        {
+                                            string elementoABuscar = archIn[5];
+                                            index = -1;
+
+                                            for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                            {
+                                                index = tabSim[i].IndexOf(elementoABuscar);
+                                                if (index != -1)
+                                                {
+                                                    index = 1;
+                                                    indexext = i;
+                                                    indexint = 1;
+                                                    break;
+                                                }
+                                            }
+                                            if (index != -1) //si TA es un simolo en tabsim
+                                            {
+                                                TA = tabSim[indexext][indexint];//Obtiene la direccion objetivo
+                                                                                //relativo a cp o a la base
+                                                if (relativoCp(TA + "H", contP))//si es relativo al cp
+                                                {
+                                                    num1 = Convert.ToInt32(TA, 16);
+                                                    num2 = Convert.ToInt32(contP, 16);
+                                                    des = num1 - num2; //desp =TA-(CP)
+                                                    obj += "2";
+                                                    if(des<0)
+                                                        desp = (des & 0xFFF).ToString("X3");
+                                                    else
+                                                        desp = des.ToString("X3");
+                                                    obj += desp;
+                                                    archIn[7] = obj;
+                                                }
+                                                else if (relativoBase(TA + "H")) //Si es relativo a la base
+                                                {
+                                                    num1 = Convert.ToInt32(TA, 16);
+                                                    num2 = Convert.ToInt32(b, 16);
+                                                    des = num1 - num2; //desp=TA-(B)
+                                                    obj += "4";
+                                                    desp = des.ToString("X3");
+                                                    obj += desp;
+                                                    archIn[7] = obj;
+                                                }
+                                                else
+                                                {//No es relativo ni al cp ni a la base
+                                                    obj += "6FFF";
+                                                    archIn[8] += " Error: No es relativo ni al CP ni a la Base";
+                                                    archIn[7] = obj;
+                                                }
+
+                                            }
+                                            else if (valida(archIn[5])) //si TA es un valor mayor 4095
+                                            {
+                                                if (archIn[5].Contains("H"))//si es en hexadecimal
+                                                {
+                                                    TA = archIn[5].Replace("H", "");
+                                                    //relativo a cp o a la base
+                                                    if (relativoCp(TA + "H", contP))//Si es relativo al cp
+                                                    {
+                                                        num1 = Convert.ToInt32(TA, 16);
+                                                        num2 = Convert.ToInt32(contP, 16);
+                                                        des = num1 - num2; //desp =TA-(CP)
+                                                        obj += "2";
+                                                        desp = des.ToString("X3");
+                                                        obj += desp;
+                                                        archIn[7] = obj;
+                                                    }
+                                                    else if (relativoBase(TA + "H"))//si es relativo a la base
+                                                    {
+                                                        num1 = Convert.ToInt32(TA, 16);
+                                                        num2 = Convert.ToInt32(b, 16);
+                                                        des = num1 - num2;//desp=TA-(B)
+                                                        obj += "4";
+                                                        desp = des.ToString("X3");
+                                                        obj += desp;
+                                                        archIn[7] = obj;
+                                                    }
+                                                    else//Si no es relativo ni a cp ni a la base
+                                                    {
+                                                        obj += "6FFF";
+                                                        archIn[8] += " Error: No es relativo ni al CP ni a la Base";
+                                                        archIn[7] = obj;
+                                                    }
+                                                }
+                                                else
+                                                { //si es en decimal
+                                                    TA = archIn[5];
+                                                    //relativo a cp o a la base
+                                                    if (relativoCp(TA, contP))//Si es relativo al cp
+                                                    {
+                                                        num1 = Convert.ToInt32(TA);
+                                                        num2 = Convert.ToInt32(contP, 16);
+                                                        des = num1 - num2; //desp =TA-(CP)
+                                                        obj += "2";
+                                                        desp = des.ToString("X3");
+                                                        obj += desp;
+                                                        archIn[7] = obj;
+                                                    }
+                                                    else if (relativoBase(TA))//si es relativo a la base
+                                                    {
+                                                        num1 = Convert.ToInt32(TA);
+                                                        num2 = Convert.ToInt32(b, 16);
+                                                        des = num1 - num2;//desp=TA-(B)
+                                                        obj += "4";
+                                                        desp = des.ToString("X3");
+                                                        obj += desp;
+                                                        archIn[7] = obj;
+                                                    }
+                                                    else//Si no es relativo ni a cp ni a la base
+                                                    {
+                                                        obj += "6FFF";
+                                                        archIn[8] += " Error: No es relativo ni al CP ni a la Base";
+                                                        archIn[7] = obj;
+                                                    }
+
+                                                }
+
+                                            }
+                                            else//Si no es un simbolo ni un valor mayor 4095
+                                            {
+                                                obj += "6FFF";
+                                                archIn[8] += " Error: Simbolo no encontrado";
+                                                archIn[7] = obj;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            TA = res[0];
+                                            //relativo a cp o a la base
+                                            if (relativoCp(TA + "H", contP))//Si es relativo al cp
+                                            {
+                                                num1 = Convert.ToInt32(TA, 16);
+                                                num2 = Convert.ToInt32(contP, 16);
+                                                des = num1 - num2; //desp =TA-(CP)
+                                                obj += "2";
+                                                desp = des.ToString("X3");
+                                                obj += desp;
+                                                archIn[7] = obj;
+                                            }
+                                            else if (relativoBase(TA + "H"))//si es relativo a la base
+                                            {
+                                                num1 = Convert.ToInt32(TA, 16);
+                                                num2 = Convert.ToInt32(b, 16);
+                                                des = num1 - num2;//desp=TA-(B)
+                                                obj += "4";
+                                                desp = des.ToString("X3");
+                                                obj += desp;
+                                                archIn[7] = obj;
+                                            }
+                                            else//Si no es relativo ni a cp ni a la base
+                                            {
+                                                obj += "6FFF";
+                                                archIn[8] += " Error: No es relativo ni al CP ni a la Base";
+                                                archIn[7] = obj;
+                                            }
+                                            if (res[2] == "E")
+                                                archIn[8] += "Error: Expresion";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        obj += "6FFF";
+                                        archIn[8] += " Error: Operando Fuera de Rango";
+                                        archIn[7] = obj;
+                                    }
+                                }
+                                break;
+                            case "INMEDIATO":
+                                codop = formato3(archIn[4].Replace("+", ""));
+                                num = Convert.ToInt32(codop, 16);
+                                num = num + 1;
+                                codop = num.ToString("X2");
+                                obj += codop;
+                                if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
+                                {
+                                    c = validaC(archIn[5].Replace("#", ""));
+                                    m = validaM(archIn[5].Replace("#", ""));
+                                    ex = false;
+                                }
+                                else
+                                {
+                                    string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                    res = r.Split(',');
+                                    c = validaC(res[0] + "H");
+                                    m = validaM(res[0] + "H");
+                                    ex = true;
+                                    if (res[2] == "E")
+                                        archIn[8] += "Error: Expresion";
+                                }
+                                if (c)// #c
+                                {
+                                    obj += "0";
+                                    if (!ex)
+                                    {
+                                        if (archIn[5].Contains("H"))
+                                        {
+                                            tem = archIn[5].Replace("#", "");
+                                            tem = tem.Replace("H", "");
+                                            num = Convert.ToInt32(tem, 16);
+                                            desp = num.ToString("X3");
+                                            obj += desp;
+                                            archIn[7] = obj;
+                                        }
+                                        else
+                                        {
+                                            tem = archIn[5].Replace("#", "");
+                                            num = Convert.ToInt32(tem);
+                                            desp = num.ToString("X3");
+                                            obj += desp;
+                                            archIn[7] = obj;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        tem = res[0];
+                                        num = Convert.ToInt32(tem, 16);
+                                        desp = num.ToString("X3");
+                                        obj += desp;
+                                        archIn[7] = obj;
+                                    }
+                                }
+                                else if (m) //#m
+                                {
+                                    if (!ex)
+                                    {
+                                        string elementoABuscar = archIn[5].Replace("#", "");
                                         index = -1;
 
                                         for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
@@ -827,10 +1109,10 @@ namespace SICXE
                                                 break;
                                             }
                                         }
-                                        if (index != -1) //si TA es un simolo en tabsim
+                                        if (index != -1) //Si es un simbolo en tabsim
                                         {
                                             TA = tabSim[indexext][indexint];//Obtiene la direccion objetivo
-                                            //relativo a cp o a la base
+                                                                            //relativo a cp o a la base
                                             if (relativoCp(TA + "H", contP))//si es relativo al cp
                                             {
                                                 num1 = Convert.ToInt32(TA, 16);
@@ -859,11 +1141,12 @@ namespace SICXE
                                             }
 
                                         }
-                                        else if (valida(archIn[5])) //si TA es un valor mayor 4095
+                                        else if (valida(archIn[5].Replace("#", "")))//si TA es un valor mayor 4095
                                         {
-                                            if (archIn[5].Contains("H"))//si es en hexadecimal
+                                            if (archIn[5].Contains("H")) //si esta en hexadecimal
                                             {
-                                                TA = archIn[5].Replace("H", "");
+                                                TA = archIn[5].Replace("#", "");
+                                                TA = TA.Replace("H", "");
                                                 //relativo a cp o a la base
                                                 if (relativoCp(TA + "H", contP))//Si es relativo al cp
                                                 {
@@ -893,8 +1176,8 @@ namespace SICXE
                                                 }
                                             }
                                             else
-                                            { //si es en decimal
-                                                TA = archIn[5];
+                                            { //si esta en decimal
+                                                TA = archIn[5].Replace("#", "");
                                                 //relativo a cp o a la base
                                                 if (relativoCp(TA, contP))//Si es relativo al cp
                                                 {
@@ -922,7 +1205,6 @@ namespace SICXE
                                                     archIn[8] += " Error: No es relativo ni al CP ni a la Base";
                                                     archIn[7] = obj;
                                                 }
-
                                             }
 
                                         }
@@ -935,94 +1217,150 @@ namespace SICXE
                                     }
                                     else
                                     {
-                                        obj += "6FFF";
-                                        archIn[8] += " Error: Operando Fuera de Rango";
-                                        archIn[7] = obj;
-                                    }
-                                }
-                                break;
-                            case "INMEDIATO":
-                                codop = formato3(archIn[4].Replace("+", ""));
-                                num = Convert.ToInt32(codop, 16);
-                                num = num + 1;
-                                codop = num.ToString("X2");
-                                obj += codop;
-                                c = validaC(archIn[5].Replace("#", ""));
-                                m = validaM(archIn[5].Replace("#", ""));
-                                if (c)// #c
-                                {
-                                    obj += "0";
-                                    if (archIn[5].Contains("H"))
-                                    {
-                                        tem = archIn[5].Replace("#", "");
-                                        tem = tem.Replace("H", "");
-                                        num = Convert.ToInt32(tem, 16);
-                                        desp = num.ToString("X3");
-                                        obj += desp;
-                                        archIn[7] = obj;
-                                    }
-                                    else
-                                    {
-                                        tem = archIn[5].Replace("#", "");
-                                        num = Convert.ToInt32(tem);
-                                        desp = num.ToString("X3");
-                                        obj += desp;
-                                        archIn[7] = obj;
-                                    }
-                                }
-                                else if (m) //#m
-                                {
-                                    string elementoABuscar = archIn[5].Replace("#", "");
-                                    index = -1;
-
-                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
-                                    {
-                                        index = tabSim[i].IndexOf(elementoABuscar);
-                                        if (index != -1)
-                                        {
-                                            index = 1;
-                                            indexext = i;
-                                            indexint = 1;
-                                            break;
-                                        }
-                                    }
-                                    if (index != -1) //Si es un simbolo en tabsim
-                                    {
-                                        TA = tabSim[indexext][indexint];//Obtiene la direccion objetivo
-                                                                        //relativo a cp o a la base
-                                        if (relativoCp(TA + "H", contP))//si es relativo al cp
+                                        TA = res[0];
+                                        //relativo a cp o a la base
+                                        if (relativoCp(TA + "H", contP))//Si es relativo al cp
                                         {
                                             num1 = Convert.ToInt32(TA, 16);
                                             num2 = Convert.ToInt32(contP, 16);
                                             des = num1 - num2; //desp =TA-(CP)
                                             obj += "2";
-                                            desp = des.ToString("X3");
+                                            desp = (des & 0xFFF).ToString("X3");
                                             obj += desp;
                                             archIn[7] = obj;
                                         }
-                                        else if (relativoBase(TA + "H")) //Si es relativo a la base
+                                        else if (relativoBase(TA + "H"))//si es relativo a la base
                                         {
                                             num1 = Convert.ToInt32(TA, 16);
                                             num2 = Convert.ToInt32(b, 16);
-                                            des = num1 - num2; //desp=TA-(B)
+                                            des = num1 - num2;//desp=TA-(B)
                                             obj += "4";
                                             desp = des.ToString("X3");
                                             obj += desp;
                                             archIn[7] = obj;
                                         }
-                                        else
-                                        {//No es relativo ni al cp ni a la base
+                                        else//Si no es relativo ni a cp ni a la base
+                                        {
                                             obj += "6FFF";
                                             archIn[8] += " Error: No es relativo ni al CP ni a la Base";
                                             archIn[7] = obj;
                                         }
-
                                     }
-                                    else if (valida(archIn[5].Replace("#", "")))//si TA es un valor mayor 4095
+                                }
+                                else
+                                {
+                                    obj += "6FFF";
+                                    archIn[8] += " Error: Operando Fuera de Rango";
+                                    archIn[7] = obj;
+                                }
+                                break;
+                            case "INDIRECTO":
+                                codop = formato3(archIn[4]);
+                                num = Convert.ToInt32(codop, 16);
+                                num = num + 2;
+                                codop = num.ToString("X2");
+                                obj += codop;
+                                if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
+                                {
+                                    c = validaC(archIn[5].Replace("@", ""));
+                                    m = validaM(archIn[5].Replace("@", ""));
+                                    ex = false;
+                                }
+                                else
+                                {
+                                    string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                    res = r.Split(',');
+                                    c = validaC(res[0] + "H");
+                                    m = validaM(res[0] + "H");
+                                    ex = true;
+                                    if (res[2] == "E")
+                                        archIn[8] += "Error: Expresion";
+                                }
+                                if (c)// c
+                                {
+                                    obj += "0";
+                                    if (!ex)
                                     {
-                                        if (archIn[5].Contains("H")) //si esta en hexadecimal
+                                        if (archIn[5].Contains("H"))
                                         {
-                                            TA = archIn[5].Replace("#", "");
+                                            tem = archIn[5].Replace("@", "");
+                                            tem = tem.Replace("H", "");
+                                            num = Convert.ToInt32(tem, 16);
+                                            desp = num.ToString("X3");
+                                            obj += desp;
+                                            archIn[7] = obj;
+                                        }
+                                        else
+                                        {
+                                            tem = archIn[5].Replace("@", "");
+                                            num = Convert.ToInt32(tem);
+                                            desp = num.ToString("X3");
+                                            obj += desp;
+                                            archIn[7] = obj;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        tem = res[0];
+                                        num = Convert.ToInt32(tem, 16);
+                                        desp = num.ToString("X3");
+                                        obj += desp;
+                                        archIn[7] = obj;
+                                    }
+                                }
+                                else if (m) //m
+                                {
+                                    if (!ex)
+                                    {
+                                        string elementoABuscar = archIn[5].Replace("@", "");
+                                        index = -1;
+
+                                        for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                        {
+                                            index = tabSim[i].IndexOf(elementoABuscar);
+                                            if (index != -1)
+                                            {
+                                                index = 1;
+                                                indexext = i;
+                                                indexint = 1;
+                                                break;
+                                            }
+                                        }
+                                        if (index != -1) //Si es un simbolo en tabsim
+                                        {
+                                            TA = tabSim[1][index];//Obtiene la direccion objetivo
+                                                                  //relativo a cp o a la base
+                                            if (relativoCp(TA + "H", contP))//si es relativo al cp
+                                            {
+                                                num1 = Convert.ToInt32(TA, 16);
+                                                num2 = Convert.ToInt32(contP, 16);
+                                                des = num1 - num2; //desp =TA-(CP)
+                                                obj += "2";
+                                                desp = des.ToString("X3");
+                                                obj += desp;
+                                                archIn[7] = obj;
+                                            }
+                                            else if (relativoBase(TA + "H")) //Si es relativo a la base
+                                            {
+                                                num1 = Convert.ToInt32(TA, 16);
+                                                num2 = Convert.ToInt32(b, 16);
+                                                des = num1 - num2; //desp=TA-(B)
+                                                obj += "4";
+                                                desp = des.ToString("X3");
+                                                obj += desp;
+                                                archIn[7] = obj;
+                                            }
+                                            else
+                                            {//No es relativo ni al cp ni a la base
+                                                obj += "6FFF";
+                                                archIn[8] += " Error: No es relativo ni al CP ni a la Base";
+                                                archIn[7] = obj;
+                                            }
+
+                                        }
+                                        else if (archIn[5].Contains("H"))//si TA es un valor mayor 4095
+                                        {
+                                            TA = archIn[5].Replace("@", "");
                                             TA = TA.Replace("H", "");
                                             //relativo a cp o a la base
                                             if (relativoCp(TA + "H", contP))//Si es relativo al cp
@@ -1051,135 +1389,18 @@ namespace SICXE
                                                 archIn[8] += " Error: No es relativo ni al CP ni a la Base";
                                                 archIn[7] = obj;
                                             }
-                                        }
-                                        else
-                                        { //si esta en decimal
-                                            TA = archIn[5].Replace("#", "");
-                                            //relativo a cp o a la base
-                                            if (relativoCp(TA, contP))//Si es relativo al cp
-                                            {
-                                                num1 = Convert.ToInt32(TA);
-                                                num2 = Convert.ToInt32(contP, 16);
-                                                des = num1 - num2; //desp =TA-(CP)
-                                                obj += "2";
-                                                desp = des.ToString("X3");
-                                                obj += desp;
-                                                archIn[7] = obj;
-                                            }
-                                            else if (relativoBase(TA))//si es relativo a la base
-                                            {
-                                                num1 = Convert.ToInt32(TA);
-                                                num2 = Convert.ToInt32(b, 16);
-                                                des = num1 - num2;//desp=TA-(B)
-                                                obj += "4";
-                                                desp = des.ToString("X3");
-                                                obj += desp;
-                                                archIn[7] = obj;
-                                            }
-                                            else//Si no es relativo ni a cp ni a la base
-                                            {
-                                                obj += "6FFF";
-                                                archIn[8] += " Error: No es relativo ni al CP ni a la Base";
-                                                archIn[7] = obj;
-                                            }
-                                        }
 
-                                    }
-                                    else//Si no es un simbolo ni un valor mayor 4095
-                                    {
-                                        obj += "6FFF";
-                                        archIn[8] += " Error: Simbolo no encontrado";
-                                        archIn[7] = obj;
-                                    }
-                                }
-                                else
-                                {
-                                    obj += "6FFF";
-                                    archIn[8] += " Error: Operando Fuera de Rango";
-                                    archIn[7] = obj;
-                                }
-                                break;
-                            case "INDIRECTO":
-                                codop = formato3(archIn[4]);
-                                num = Convert.ToInt32(codop, 16);
-                                num = num + 2;
-                                codop = num.ToString("X2");
-                                obj += codop;
-                                c = validaC(archIn[5].Replace("@", ""));
-                                m = validaM(archIn[5].Replace("@", ""));
-                                if (c)// c
-                                {
-                                    obj += "0";
-                                    if (archIn[5].Contains("H"))
-                                    {
-                                        tem = archIn[5].Replace("@", "");
-                                        tem = tem.Replace("H", "");
-                                        num = Convert.ToInt32(tem, 16);
-                                        desp = num.ToString("X3");
-                                        obj += desp;
-                                        archIn[7] = obj;
+                                        }
+                                        else//Si no es un simbolo ni un valor mayor 4095
+                                        {
+                                            obj += "6FFF";
+                                            archIn[8] += " Error: Simbolo no encontrado";
+                                            archIn[7] = obj;
+                                        }
                                     }
                                     else
                                     {
-                                        tem = archIn[5].Replace("@", "");
-                                        num = Convert.ToInt32(tem);
-                                        desp = num.ToString("X3");
-                                        obj += desp;
-                                        archIn[7] = obj;
-                                    }
-                                }
-                                else if (m) //m
-                                {
-                                    string elementoABuscar = archIn[5].Replace("@", "");
-                                    index = -1;
-
-                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
-                                    {
-                                        index = tabSim[i].IndexOf(elementoABuscar);
-                                        if (index != -1)
-                                        {
-                                            index = 1;
-                                            indexext = i;
-                                            indexint = 1;
-                                            break;
-                                        }
-                                    }
-                                    if (index != -1) //Si es un simbolo en tabsim
-                                    {
-                                        TA = tabSim[1][index];//Obtiene la direccion objetivo
-                                                              //relativo a cp o a la base
-                                        if (relativoCp(TA + "H", contP))//si es relativo al cp
-                                        {
-                                            num1 = Convert.ToInt32(TA, 16);
-                                            num2 = Convert.ToInt32(contP, 16);
-                                            des = num1 - num2; //desp =TA-(CP)
-                                            obj += "2";
-                                            desp = des.ToString("X3");
-                                            obj += desp;
-                                            archIn[7] = obj;
-                                        }
-                                        else if (relativoBase(TA + "H")) //Si es relativo a la base
-                                        {
-                                            num1 = Convert.ToInt32(TA, 16);
-                                            num2 = Convert.ToInt32(b, 16);
-                                            des = num1 - num2; //desp=TA-(B)
-                                            obj += "4";
-                                            desp = des.ToString("X3");
-                                            obj += desp;
-                                            archIn[7] = obj;
-                                        }
-                                        else
-                                        {//No es relativo ni al cp ni a la base
-                                            obj += "6FFF";
-                                            archIn[8] += " Error: No es relativo ni al CP ni a la Base";
-                                            archIn[7] = obj;
-                                        }
-
-                                    }
-                                    else if (archIn[5].Contains("H"))//si TA es un valor mayor 4095
-                                    {
-                                        TA = archIn[5].Replace("@", "");
-                                        TA = TA.Replace("H", "");
+                                        TA = res[0];
                                         //relativo a cp o a la base
                                         if (relativoCp(TA + "H", contP))//Si es relativo al cp
                                         {
@@ -1207,13 +1428,6 @@ namespace SICXE
                                             archIn[8] += " Error: No es relativo ni al CP ni a la Base";
                                             archIn[7] = obj;
                                         }
-
-                                    }
-                                    else//Si no es un simbolo ni un valor mayor 4095
-                                    {
-                                        obj += "6FFF";
-                                        archIn[8] += " Error: Simbolo no encontrado";
-                                        archIn[7] = obj;
                                     }
                                 }
                                 else
@@ -1236,10 +1450,24 @@ namespace SICXE
                                 obj += codop;
                                 if (archIn[5].Contains(","))
                                 {
+
                                     partes = archIn[5].Split(',');
+
                                     if (partes[partes.Length - 1] == "X")//SI ES INDEXADO
                                     {
-                                        m = validaM(partes[0]);
+                                        if (!(partes[0].Contains("+") | partes[0].Contains("-") | partes[0].Contains("*") | partes[0].Contains("/") | partes[0].Contains("(") | partes[0].Contains(")")))
+                                        {
+                                            m = validaM(partes[0]);
+                                        }
+                                        else
+                                        {
+                                            string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                            res = r.Split(',');
+                                            partes[0] = res[0] + "H";
+                                            m = validaM(partes[0]);
+                                            if (res[2] == "E")
+                                                archIn[8] += "Error: Expresion";
+                                        }
                                         if (m) //m,X
                                         {
                                             string elementoABuscar = partes[0];
@@ -1311,10 +1539,137 @@ namespace SICXE
                                 }
                                 else //no es indexado pero si extendido
                                 {
-                                    m = validaM(archIn[5]);
+                                    if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
+                                    {
+                                        c = validaC(archIn[5]);
+                                        m = validaM(archIn[5]);
+                                        ex = false;
+                                    }
+                                    else
+                                    {
+                                        string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                        res = r.Split(',');
+                                        c = validaC(res[0] + "H");
+                                        m = validaM(res[0] + "H");
+                                        ex = true;
+                                        if (res[2] == "E")
+                                            archIn[8] += "Error: Expresion";
+                                    }
                                     if (m)//m
                                     {
-                                        string elementoABuscar = archIn[5];
+                                        if (!ex)
+                                        {
+                                            string elementoABuscar = archIn[5];
+                                            index = -1;
+
+                                            for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                            {
+                                                index = tabSim[i].IndexOf(elementoABuscar);
+                                                if (index != -1)
+                                                {
+                                                    index = 1;
+                                                    indexext = i;
+                                                    indexint = 1;
+                                                    break;
+                                                }
+                                            }
+                                            if (index != -1) //si es un simbolo en tabsim
+                                            {
+                                                obj += "1";
+                                                dir = tabSim[indexext][indexint];
+                                                num = Convert.ToInt32(dir, 16);
+                                                dir = num.ToString("X5");
+                                                obj += dir + "*";
+                                                archIn[7] = obj;
+                                            }
+                                            else if (valida(archIn[5])) //si es un valor mayor a 4095
+                                            {
+                                                if (archIn[5].Contains("H"))
+                                                {
+                                                    obj += "1";
+                                                    dir = archIn[5].Replace("H", "");
+                                                    num = Convert.ToInt32(dir, 16);
+                                                    dir = num.ToString("X5");
+                                                    obj += dir;
+                                                    archIn[7] = obj;
+                                                }
+                                                else
+                                                {
+                                                    obj += "1";
+                                                    dir = archIn[5];
+                                                    num = Convert.ToInt32(dir);
+                                                    dir = num.ToString("X5");
+                                                    obj += dir;
+                                                    archIn[7] = obj;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                obj += "7FFFFF";
+                                                archIn[8] += " Error: Simbolo no encontrado";
+                                                archIn[7] = obj;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            TA = res[0]+"H";
+                                            if (valida(TA)) //si es un valor mayor a 4095
+                                            {
+                                                if (TA.Contains("H"))
+                                                {
+                                                    obj += "1";
+                                                    dir = TA.Replace("H", "");
+                                                    num = Convert.ToInt32(dir, 16);
+                                                    dir = num.ToString("X5");
+                                                    obj += dir;
+                                                    archIn[7] = obj;
+                                                }
+                                                else
+                                                {
+                                                    obj += "1";
+                                                    dir = TA;
+                                                    num = Convert.ToInt32(dir);
+                                                    dir = num.ToString("X5");
+                                                    obj += dir;
+                                                    archIn[7] = obj;
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        obj += "7FFFFF";
+                                        archIn[8] += " Error: Operando Fuera de Rango";
+                                        archIn[7] = obj;
+                                    }
+                                }
+                                break;
+                            case "INMEDIATO":
+                                codop = formato3(archIn[4].Replace("+", ""));
+                                num = Convert.ToInt32(codop, 16);
+                                num = num + 1;
+                                codop = num.ToString("X2");
+                                obj += codop;
+                                if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
+                                {
+                                    m = validaM(archIn[5].Replace("#", ""));
+                                    ex = false;
+                                }
+                                else
+                                {
+                                    string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                    res = r.Split(',');
+                                    m = validaM(res[0] + "H");
+                                    ex = true;
+                                    if (res[2] == "E")
+                                        archIn[8] += "Error: Expresion";
+                                }
+                                if (!ex)
+                                {
+                                    if (m)//#m
+                                    {
+                                        string elementoABuscar = archIn[5].Replace("#", "");
                                         index = -1;
 
                                         for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
@@ -1337,21 +1692,22 @@ namespace SICXE
                                             obj += dir + "*";
                                             archIn[7] = obj;
                                         }
-                                        else if (valida(archIn[5])) //si es un valor mayor a 4095
+                                        else if (valida(archIn[5].Replace("#", ""))) //si es un valor mayor a 4095
                                         {
-                                            if (archIn[5].Contains("H"))
+                                            if (archIn[5].Contains("H"))//si esta en hexadecimal
                                             {
                                                 obj += "1";
-                                                dir = archIn[5].Replace("H", "");
+                                                dir = archIn[5].Replace("#", "");
+                                                dir = dir.Replace("H", "");
                                                 num = Convert.ToInt32(dir, 16);
                                                 dir = num.ToString("X5");
                                                 obj += dir;
                                                 archIn[7] = obj;
                                             }
                                             else
-                                            {
+                                            {// si esta en decimal
                                                 obj += "1";
-                                                dir = archIn[5];
+                                                dir = archIn[5].Replace("#", "");
                                                 num = Convert.ToInt32(dir);
                                                 dir = num.ToString("X5");
                                                 obj += dir;
@@ -1372,40 +1728,10 @@ namespace SICXE
                                         archIn[7] = obj;
                                     }
                                 }
-                                break;
-                            case "INMEDIATO":
-                                codop = formato3(archIn[4].Replace("+", ""));
-                                num = Convert.ToInt32(codop, 16);
-                                num = num + 1;
-                                codop = num.ToString("X2");
-                                obj += codop;
-                                m = validaM(archIn[5].Replace("#", ""));
-                                if (m)//#m
+                                else
                                 {
-                                    string elementoABuscar = archIn[5].Replace("#", "");
-                                    index = -1;
-
-                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
-                                    {
-                                        index = tabSim[i].IndexOf(elementoABuscar);
-                                        if (index != -1)
-                                        {
-                                            index = 1;
-                                            indexext = i;
-                                            indexint = 1;
-                                            break;
-                                        } 
-                                    }
-                                    if (index != -1) //si es un simbolo en tabsim
-                                    {
-                                        obj += "1";
-                                        dir = tabSim[indexext][indexint];
-                                        num = Convert.ToInt32(dir, 16);
-                                        dir = num.ToString("X5");
-                                        obj += dir + "*";
-                                        archIn[7] = obj;
-                                    }
-                                    else if (valida(archIn[5].Replace("#", ""))) //si es un valor mayor a 4095
+                                    TA = res[0] + "H";
+                                    if (valida(archIn[5].Replace("#", ""))) //si es un valor mayor a 4095
                                     {
                                         if (archIn[5].Contains("H"))//si esta en hexadecimal
                                         {
@@ -1430,15 +1756,10 @@ namespace SICXE
                                     else
                                     {
                                         obj += "7FFFFF";
-                                        archIn[8] += " Error: Simbolo no encontrado";
+                                        archIn[8] += " Error: Operando Fuera de Rango";
                                         archIn[7] = obj;
                                     }
-                                }
-                                else
-                                {
-                                    obj += "7FFFFF";
-                                    archIn[8] += " Error: Operando Fuera de Rango";
-                                    archIn[7] = obj;
+
                                 }
                                 break;
                             case "INDIRECTO":
@@ -1447,39 +1768,93 @@ namespace SICXE
                                 num = num + 2;
                                 codop = num.ToString("X2");
                                 obj += codop;
-                                m = validaM(archIn[5].Replace("@", ""));
-                                if (m)//m
+                                if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
                                 {
-                                    string elementoABuscar = archIn[5].Replace("@", "");
-                                    index = -1;
-
-                                    for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
+                                    m = validaM(archIn[5].Replace("@", ""));
+                                    ex = false;
+                                }
+                                else
+                                {
+                                    string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
+                                    res = r.Split(',');
+                                    m = validaM(res[0] + "H");
+                                    ex = true;
+                                    if (res[2] == "E")
+                                        archIn[8] += "Error: Expresion";
+                                }
+                                if (!ex)
+                                {
+                                    if (m)//m
                                     {
-                                        index = tabSim[i].IndexOf(elementoABuscar);
-                                        if (index != -1)
+                                        string elementoABuscar = archIn[5].Replace("@", "");
+                                        index = -1;
+
+                                        for (int i = 0; i < tabSim.Count; i++) // Itera a través de las sublistas
                                         {
-                                            index = 1;
-                                            indexext = i;
-                                            indexint = 1;
-                                            break;
+                                            index = tabSim[i].IndexOf(elementoABuscar);
+                                            if (index != -1)
+                                            {
+                                                index = 1;
+                                                indexext = i;
+                                                indexint = 1;
+                                                break;
+                                            }
                                         }
-                                    }
 
-                                    if (index != -1) //si es un simbolo en tabsim
-                                    {
-                                        obj += "1";
-                                        dir = tabSim[indexext][indexint];
-                                        num = Convert.ToInt32(dir, 16);
-                                        dir = num.ToString("X5");
-                                        obj += dir + "*";
-                                        archIn[7] = obj;
-                                    }
-                                    else if (valida(archIn[5].Replace("@", ""))) //si es un valor mayor a 4095
-                                    {
-                                        if (archIn[5].Contains("H"))//si esta en hexadecimal
+                                        if (index != -1) //si es un simbolo en tabsim
                                         {
                                             obj += "1";
-                                            dir = archIn[5].Replace("@", "");
+                                            dir = tabSim[indexext][indexint];
+                                            num = Convert.ToInt32(dir, 16);
+                                            dir = num.ToString("X5");
+                                            obj += dir + "*";
+                                            archIn[7] = obj;
+                                        }
+                                        else if (valida(archIn[5].Replace("@", ""))) //si es un valor mayor a 4095
+                                        {
+                                            if (archIn[5].Contains("H"))//si esta en hexadecimal
+                                            {
+                                                obj += "1";
+                                                dir = archIn[5].Replace("@", "");
+                                                dir = dir.Replace("H", "");
+                                                num = Convert.ToInt32(dir, 16);
+                                                dir = num.ToString("X5");
+                                                obj += dir;
+                                                archIn[7] = obj;
+                                            }
+                                            else
+                                            {//si esta en decimal
+                                                obj += "1";
+                                                dir = archIn[5].Replace("@", "");
+                                                num = Convert.ToInt32(dir);
+                                                dir = num.ToString("X5");
+                                                obj += dir;
+                                                archIn[7] = obj;
+                                            }
+                                        }
+                                        else // Si no es un simbolo ni un valor mayor a 4095
+                                        {
+                                            obj += "7FFFFF";
+                                            archIn[8] += " Error: Simbolo no encontrado";
+                                            archIn[7] = obj;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        obj += "7FFFFF";
+                                        archIn[8] += " Error: Operando Fuera de Rango";
+                                        archIn[7] = obj;
+                                    }
+                                }
+                                else
+                                {
+                                    TA = res[0] + "H";
+                                    if (valida(TA.Replace("@", ""))) //si es un valor mayor a 4095
+                                    {
+                                        if (TA.Contains("H"))//si esta en hexadecimal
+                                        {
+                                            obj += "1";
+                                            dir = TA.Replace("@", "");
                                             dir = dir.Replace("H", "");
                                             num = Convert.ToInt32(dir, 16);
                                             dir = num.ToString("X5");
@@ -1489,25 +1864,19 @@ namespace SICXE
                                         else
                                         {//si esta en decimal
                                             obj += "1";
-                                            dir = archIn[5].Replace("@", "");
+                                            dir = TA.Replace("@", "");
                                             num = Convert.ToInt32(dir);
                                             dir = num.ToString("X5");
                                             obj += dir;
                                             archIn[7] = obj;
                                         }
                                     }
-                                    else // Si no es un simbolo ni un valor mayor a 4095
+                                    else
                                     {
                                         obj += "7FFFFF";
-                                        archIn[8] += " Error: Simbolo no encontrado";
+                                        archIn[8] += " Error: Operando Fuera de Rango";
                                         archIn[7] = obj;
                                     }
-                                }
-                                else
-                                {
-                                    obj += "7FFFFF";
-                                    archIn[8] += " Error: Operando Fuera de Rango";
-                                    archIn[7] = obj;
                                 }
                                 break;
                         }
@@ -1519,19 +1888,43 @@ namespace SICXE
                 switch (archIn[4])
                 {
                     case "WORD":
-                        if (archIn[5].Contains("H")) //si es un valor en Hexadecimal
+                        if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
                         {
-                            tem = archIn[5].Replace("H", "");
-                            num = Convert.ToInt32(tem, 16);
-                            obj += num.ToString("X6");
-                            archIn[7] = obj;
+                            if (archIn[5].Contains("H")) //si es un valor en Hexadecimal
+                            {
+                                tem = archIn[5].Replace("H", "");
+                                num = Convert.ToInt32(tem, 16);
+                                obj += num.ToString("X6");
+                                archIn[7] = obj;
+                            }
+                            else
+                            {//si es un valor en decimal
+                                tem = archIn[5];
+                                num = Convert.ToInt32(tem);
+                                obj += num.ToString("X6");
+                                archIn[7] = obj;
+                            }
                         }
                         else
-                        {//si es un valor en decimal
-                            tem = archIn[5];
-                            num = Convert.ToInt32(tem);
-                            obj += num.ToString("X6");
-                            archIn[7] = obj;
+                        {
+                            string r = archintermediocrea.resExpre(archivointermedio,int.Parse(archIn[0]), tabSim, 0);
+                            string[] res = r.Split(',');
+                            if (res[2] == "E")
+                                archIn[8] += "Error: Expresion";
+                            if (res[1] == "A")
+                            {
+                                tem = res[0];
+                                num = Convert.ToInt32(tem,16);
+                                obj += (num & 0xFFFFFF).ToString("X6");
+                                archIn[7] = obj;
+                            }
+                            else
+                            {
+                                tem = res[0];
+                                num = Convert.ToInt32(tem,16);
+                                obj += (num & 0xFFFFFF).ToString("X6");
+                                archIn[7] = obj+"*";
+                            }
                         }
                         break;
                     case "BYTE":
@@ -1606,6 +1999,14 @@ namespace SICXE
                 codop = "F4";
             if (s == "FIX")
                 codop = "C4";
+            if (s == "FLOAT")
+                codop = "C0";
+            if (s == "NORM")
+                codop = "C8";
+            if (s == "SIO")
+                codop = "F0";
+            if (s == "TIO")
+                codop = "F8";
             return codop;
         }
         public string formato2(string s)
@@ -1617,6 +2018,22 @@ namespace SICXE
                 codop = "A4";
             if (s == "ADDR")
                 codop = "90";
+            if (s == "COMPR")
+                codop = "A0";
+            if (s == "DIVR")
+                codop = "9C";
+            if (s == "MULR")
+                codop = "98";
+            if (s == "RMO")
+                codop = "AC";
+            if (s == "SHIFTR")
+                codop = "A8";
+            if (s == "SUBR")
+                codop = "94";
+            if (s == "SVC")
+                codop = "B0";
+            if (s == "TIXR")
+                codop = "B8";
             return codop;
         }
 
@@ -1635,6 +2052,74 @@ namespace SICXE
                 codop = "4C";
             if (s == "RSUB")
                 codop = "4C";
+            if (s == "ADDF")
+                codop = "58";
+            if (s == "AND")
+                codop = "40";
+            if (s == "COMP")
+                codop = "28";
+            if (s == "COMPF")
+                codop = "88";
+            if (s == "DIV")
+                codop = "24";
+            if (s == "DIVF")
+                codop = "64";
+            if (s == "J")
+                codop = "3C";
+            if (s == "JEQ")
+                codop = "30";
+            if (s == "JGT")
+                codop = "34";
+            if (s == "JLT")
+                codop = "38";
+            if (s == "JSUB")
+                codop = "48";
+            if (s == "LDA")
+                codop = "00";
+            if (s == "LDCH")
+                codop = "50";
+            if (s == "LDF")
+                codop = "70";
+            if (s == "LDS")
+                codop = "6C";
+            if (s == "LDT")
+                codop = "74";
+            if (s == "LPS")
+                codop = "D0";
+            if (s == "MUL")
+                codop = "20";
+            if (s == "MULF")
+                codop = "60";
+            if (s == "OR")
+                codop = "44";
+            if (s == "RD")
+                codop = "D8";
+            if (s == "SSK")
+                codop = "EC";
+            if (s == "STB")
+                codop = "78";
+            if (s == "STCH")
+                codop = "54";
+            if (s == "STF")
+                codop = "80";
+            if (s == "STI")
+                codop = "D4";
+            if (s == "STS")
+                codop = "7C";
+            if (s == "STSW")
+                codop = "E8";
+            if (s == "STT")
+                codop = "84";
+            if (s == "STX")
+                codop = "10";
+            if (s == "SUB")
+                codop = "1C";
+            if (s == "SUBF")
+                codop = "5C";
+            if (s == "TIX")
+                codop = "2C";
+            if (s == "WD")
+                codop = "DC";
             return codop;
         }
 
@@ -1689,7 +2174,7 @@ namespace SICXE
             {
                 try
                 {
-                    num = Convert.ToInt32(s.Replace("H", ""));
+                    num = Convert.ToInt32(s.Replace("H",""));
                     if (num <= 4095)
                         return false;
                 }
@@ -1812,7 +2297,7 @@ namespace SICXE
                 return false;
         }
 
-
+        
         /*
         public void indentificaError(string l)
         {

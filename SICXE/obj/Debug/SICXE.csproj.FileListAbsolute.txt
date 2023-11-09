@@ -49,7 +49,6 @@ C:\Users\emman\OneDrive\Documentos\Practica 03\SICXE\bin\Debug\Antlr4.Runtime.dl
 C:\Users\emman\OneDrive\Documentos\Practica 03\SICXE\bin\Debug\Antlr4.Runtime.xml
 C:\Users\emman\OneDrive\Documentos\Practica 03\SICXE\obj\Debug\SICXE.csproj.CopyComplete
 C:\Users\emman\OneDrive\Documentos\Practica 03\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
-C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSLexer.cs
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSParser.cs
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\analizadorLSListener.cs
@@ -97,3 +96,13 @@ C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Soft
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.CopyComplete
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.exe
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.pdb
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\bin\Debug\MathParser.org-mXparser.dll
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\AnalizadorExpresionesLexer.cs
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\AnalizadorExpresionesParser.cs
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\AnalizadorExpresionesListener.cs
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\AnalizadorExpresionesBaseListener.cs
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\AnalizadorExpresionesVisitor.cs
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\AnalizadorExpresionesBaseVisitor.cs
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.formularioref.resources
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.MAIN.resources
+C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
