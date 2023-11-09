@@ -1046,7 +1046,7 @@ namespace SICXE
                                                 num2 = Convert.ToInt32(contP, 16);
                                                 des = num1 - num2; //desp =TA-(CP)
                                                 obj += "2";
-                                                desp = des.ToString("X3");
+                                                desp = (des &0xFFF).ToString("X3");
                                                 obj += desp;
                                                 archIn[7] = obj;
                                             }
@@ -1096,11 +1096,13 @@ namespace SICXE
                                     res = r.Split(',');
                                     if (res[1] == "R")
                                     {
-                                        m = true;
+                                        //m = true;
+                                        m = validaM(res[0] + "H");
                                     }
                                     else
                                     {
-                                        c = true;
+                                        c = validaC(res[0] + "H");
+                                        //c = true;
                                     }
                                     //c = validaC(res[0] + "H");
                                     //m = validaM(res[0] + "H");

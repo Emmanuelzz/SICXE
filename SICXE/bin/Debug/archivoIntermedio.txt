@@ -14,7 +14,7 @@ LINEA	FORM	CP	ETIQUETA   INSTR   OP		MOD	Codigo Objeto	Errores
 10        3     0026               LDA     #(6*NUMERO-10)INMEDIATO    0100E6                          
 11              0029               ORG     100H                                                   
 12        3     0100    SALTO      JLT     ETIQ      SIMPLE       3B2F12                          
-13        3     0103               LDT     SALTO-16  SIMPLE       772FFFFFFEA                     
+13        3     0103               LDT     SALTO-16  SIMPLE       772FEA                          
 14              0106               RESW    12                                                     
 15              012A    COUNT      WORD    SALTO-(TAM-ETIQ)             0000FE*                         
 16              012D    EXPR       EQU     (12*(COUNT-SALTO))-(-ETIQ)                                             
@@ -34,7 +34,7 @@ HEJEMEX000000000134
 T000000030003C3
 T00001502B450
 T000023061BEFFF0100E6
-T000100083B2F12772FFFFFFEA
+T000100063B2F12772FEA
 T00012A0A0000FE0000750E10012A
 M00000006+EJEMEX
 M00012A06+EJEMEX
