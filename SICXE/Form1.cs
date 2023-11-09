@@ -603,8 +603,12 @@ namespace SICXE
             int des = 0;
             int num1 = 0;
             int num2 = 0;
+            int vienecsimb = 0;
+            string cpsimb = "";
             if (archIn[1] != "" && archIn[8].ToString() != "ERROR DE SINTAXIS" && archIn[4] != "RSUB" && archIn[8].ToString() != "Instruccion no existe")
             {
+                vienecsimb = 0;
+                cpsimb = "";
                 switch (archIn[1])
                 {//identifica el formato 
                     case "1":
@@ -823,49 +827,86 @@ namespace SICXE
                                
                                     if (!(archIn[5].Contains("+") | archIn[5].Contains("-") | archIn[5].Contains("*") | archIn[5].Contains("/") | archIn[5].Contains("(") | archIn[5].Contains(")")))
                                     {
-                                        c = validaC(archIn[5]);
-                                        m = validaM(archIn[5]);
+                                        /*c = validaC(archIn[5]);
+                                        m = validaM(archIn[5]);*/
+                                        int simbolosreng2 = 0;
+                                        for (int i = 0; i < tabSim.Count; i++)
+                                        {
+                                            if (tabSim[i][0] == archIn[5].ToString())
+                                            {
+                                                simbolosreng2 = i;
+                                            }
+                                        }
+                                        if (tabSim[simbolosreng2][2] == "R")
+                                        {
+                                            m = true;
+                                        }
+                                        else
+                                        {
+                                            c = true;
+                                            vienecsimb = 1;
+                                            cpsimb = tabSim[simbolosreng2][1];
+                                        }
                                         ex = false;
                                     }
                                     else
                                     {
                                         string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
                                         res = r.Split(',');
-                                        c = validaC(res[0]+"H");
-                                        m = validaM(res[0] +"H");
+                                        if(res[1]=="R")
+                                        {
+                                            m = true;
+                                        }
+                                        else
+                                        {
+                                            c = true;
+                                        }
+                                        //c = validaC(res[0]+"H");
+                                        //m = validaM(res[0] +"H");
                                         ex = true;
                                         if (res[2] == "E")
                                             archIn[8] += "Error: Expresion";
                                     }
                                     if (c)// c
                                     {
-                                        obj += "0";
-                                        if (!ex)
+                                        if (vienecsimb == 1)
                                         {
-                                            if (archIn[5].Contains("H")) //si es un valor en hexadecimal
+                                            num = Convert.ToInt32(cpsimb, 16);
+                                            desp = num.ToString("X3");
+                                            obj += 0;
+                                            obj += desp;
+                                            archIn[7] = obj;
+                                        }
+                                        else
+                                        {
+                                            obj += "0";
+                                            if (!ex)
                                             {
-                                                tem = archIn[5].Replace("H", "");
+                                                if (archIn[5].Contains("H")) //si es un valor en hexadecimal
+                                                {
+                                                    tem = archIn[5].Replace("H", "");
+                                                    num = Convert.ToInt32(tem, 16);
+                                                    desp = num.ToString("X3");
+                                                    obj += desp;
+                                                    archIn[7] = obj;
+                                                }
+                                                else //si es un valor en decimal
+                                                {
+                                                    tem = archIn[5];
+                                                    num = Convert.ToInt32(tem);
+                                                    desp = num.ToString("X3");
+                                                    obj += desp;
+                                                    archIn[7] = obj;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                tem = res[0];
                                                 num = Convert.ToInt32(tem, 16);
                                                 desp = num.ToString("X3");
                                                 obj += desp;
                                                 archIn[7] = obj;
                                             }
-                                            else //si es un valor en decimal
-                                            {
-                                                tem = archIn[5];
-                                                num = Convert.ToInt32(tem);
-                                                desp = num.ToString("X3");
-                                                obj += desp;
-                                                archIn[7] = obj;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            tem = res[0];
-                                            num = Convert.ToInt32(tem, 16);
-                                            desp = num.ToString("X3");
-                                            obj += desp;
-                                            archIn[7] = obj;
                                         }
                                     }
                                     else if (m) //m
@@ -1053,8 +1094,16 @@ namespace SICXE
                                 {
                                     string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
                                     res = r.Split(',');
-                                    c = validaC(res[0] + "H");
-                                    m = validaM(res[0] + "H");
+                                    if (res[1] == "R")
+                                    {
+                                        m = true;
+                                    }
+                                    else
+                                    {
+                                        c = true;
+                                    }
+                                    //c = validaC(res[0] + "H");
+                                    //m = validaM(res[0] + "H");
                                     ex = true;
                                     if (res[2] == "E")
                                         archIn[8] += "Error: Expresion";
@@ -1270,8 +1319,16 @@ namespace SICXE
                                 {
                                     string r = archintermediocrea.resExpre(archivointermedio, int.Parse(archIn[0]), tabSim, 0);
                                     res = r.Split(',');
-                                    c = validaC(res[0] + "H");
-                                    m = validaM(res[0] + "H");
+                                    if (res[1] == "R")
+                                    {
+                                        m = true;
+                                    }
+                                    else
+                                    {
+                                        c = true;
+                                    }
+                                    //c = validaC(res[0] + "H");
+                                    //m = validaM(res[0] + "H");
                                     ex = true;
                                     if (res[2] == "E")
                                         archIn[8] += "Error: Expresion";
@@ -2175,7 +2232,7 @@ namespace SICXE
                 try
                 {
                     num = Convert.ToInt32(s.Replace("H",""));
-                    if (num <= 4095)
+                    //if (num <= 4095)
                         return false;
                 }
                 catch (Exception e)

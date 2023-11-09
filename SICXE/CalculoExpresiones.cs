@@ -22,6 +22,10 @@ namespace SICXE
         {
             string tipo = "";
             bool absoluto = false;
+            if(expresion[0]== '#')
+            {
+                expresion = expresion.Substring(1);
+            }
             string patron = @"[+\-*/()]";
             //PRIMERO ANALIZAMOS SI TODOS SON ABSOLUTOS
             absoluto =absolutos(listaabsyrel);

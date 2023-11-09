@@ -106,3 +106,4 @@ C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debu
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.formularioref.resources
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.MAIN.resources
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
