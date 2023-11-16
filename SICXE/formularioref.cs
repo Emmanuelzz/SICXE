@@ -381,6 +381,7 @@ namespace SICXE
                     lineas.Clear();
                 }
             }
+            cargarbutton.Visible = true;
         }
 
 
@@ -439,5 +440,12 @@ namespace SICXE
         {
 
         }
+
+        private void cargarbutton_Click(object sender, EventArgs e)
+        {
+            Cargador carga = new Cargador();
+            carga.Show();
+        }
+
     }
 }

@@ -68,6 +68,12 @@
       <DependentUpon>analizadorLS.g4</DependentUpon>
     </Compile>
     <Compile Include="CalculoExpresiones.cs" />
+    <Compile Include="Cargador.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Cargador.Designer.cs">
+      <DependentUpon>Cargador.cs</DependentUpon>
+    </Compile>
     <Compile Include="construyearchintermedio.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -91,12 +97,6 @@
     <Compile Include="formularioref.Designer.cs">
       <DependentUpon>formularioref.cs</DependentUpon>
     </Compile>
-    <Compile Include="MAIN.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MAIN.Designer.cs">
-      <DependentUpon>MAIN.cs</DependentUpon>
-    </Compile>
     <Compile Include="obj\Debug\AnalizadorExpresionesBaseListener.cs" />
     <Compile Include="obj\Debug\AnalizadorExpresionesBaseVisitor.cs" />
     <Compile Include="obj\Debug\AnalizadorExpresionesLexer.cs" />
@@ -104,15 +104,24 @@
     <Compile Include="obj\Debug\AnalizadorExpresionesParser.cs" />
     <Compile Include="obj\Debug\AnalizadorExpresionesVisitor.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Programaobj.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Programaobj.Designer.cs">
+      <DependentUpon>Programaobj.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Cargador.resx">
+      <DependentUpon>Cargador.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="formularioref.resx">
       <DependentUpon>formularioref.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MAIN.resx">
-      <DependentUpon>MAIN.cs</DependentUpon>
+    <EmbeddedResource Include="Programaobj.resx">
+      <DependentUpon>Programaobj.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

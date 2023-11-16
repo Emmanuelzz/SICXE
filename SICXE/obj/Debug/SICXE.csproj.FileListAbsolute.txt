@@ -83,7 +83,6 @@ C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Soft
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.Antlr4GeneratedCodeFileListAbsolute.txt
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.Form1.resources
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.formularioref.resources
-C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.MAIN.resources
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.Properties.Resources.resources
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.GenerateResource.cache
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csproj.CoreCompileInputs.cache
@@ -107,3 +106,5 @@ C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debu
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.MAIN.resources
 C:\Users\Joan Hernández\Documents\Software de Sistemas\LAB\LABSW\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
 C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.csprojAssemblyReference.cache
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.Cargador.resources
+C:\Users\emman\OneDrive\Documentos\Semestre 8\Laboratorio de Fundamentos de Software de Sistemas\PROYECTO REPOSITORIO\SICXE\SICXE\obj\Debug\SICXE.Programaobj.resources

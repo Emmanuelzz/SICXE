@@ -10,11 +10,18 @@ using System.Windows.Forms;
 
 namespace SICXE
 {
-    public partial class MAIN : Form
+    public partial class Programaobj : Form
     {
-        public MAIN()
+        public Programaobj()
         {
             InitializeComponent();
+        }
+
+
+        public void MostrarTexto(string texto)
+        {
+            // Muestra el contenido del archivo de texto en el RichTextBox
+            richTextBox1.Text = texto;
         }
     }
 }
