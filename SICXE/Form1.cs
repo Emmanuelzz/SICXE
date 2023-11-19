@@ -547,9 +547,9 @@ namespace SICXE
             string t = "";
             string path1 = Environment.CurrentDirectory;
             // Abre el archivo intermedio 
-            StreamWriter reg = new StreamWriter(path1 + "\\registros.txt");
+            StreamWriter reg = new StreamWriter(path1 + "\\registros.obj");
 
-            reg.WriteLine("\nREGISTROS\n");
+            //reg.WriteLine("\nREGISTROS\n");
             foreach (string elemento in registros.Items)
             {
                 // Escribe cada elemento del ListBox en una línea del archivo
@@ -2038,14 +2038,14 @@ namespace SICXE
         public void separaexpresion(string s)
         {
 
-            string[] partes = s.Split(' '); // Dividir la cadena en partes usando espacios en blanco
+            string[] partes = s.Split(' '); // Divide la cadena en partes usando espacios en blanco
                                             //string form = formatos[formatos.Count];
             Array.Resize(ref partes, partes.Length + 2);
             partes[partes.Length - 1] = "";
 
-            etiqueta = partes[0]; // Obtener la ETIQUETA
-            instruccion = partes[1]; // Obtener la INSTR
-            operando = partes[2]; // Obtener el OPERANDO
+            etiqueta = partes[0]; // Obtienw la ETIQUETA
+            instruccion = partes[1]; // Obtiene la INSTR
+            operando = partes[2]; // Obtiene el OPERANDO
             if (partes.Length > 3 && partes[3] != null && partes[3] != "")
                 operando += partes[3];
 

@@ -16,6 +16,9 @@ namespace SICXE
     {
         private bool importedFile = false;
         private string importedText = null;
+        List<string> entradasobj = new List<string>();
+        int entradas = 0;
+        private Programaobj formularioTexto;
 
         public Cargador()
         {
@@ -37,7 +40,7 @@ namespace SICXE
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = Environment.CurrentDirectory;
-            openFileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Todos los archivos (*.*)|*.*";
+            openFileDialog.Filter = "Archivos de texto (*.obj)|*.obj";
 
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
@@ -47,24 +50,46 @@ namespace SICXE
 
                 importedFile = true;
 
+                entradas++;
 
-                MostrarContenidoFormularioTexto(importedText);
+                    entradasobj.Add(entradas.ToString());
+                    string[] lines = File.ReadAllLines(fileName);
+                    entradasobj.AddRange(lines);
+                
+
+                MostrarContenidoFormularioTexto(entradasobj);
             }
             else
             {
-                importedFile = false; 
+                importedFile = false;
             }
         }
 
-        private void MostrarContenidoFormularioTexto(string texto)
+        private void MostrarContenidoFormularioTexto(List<string> entradasobj)
         {
+            // VERIFICA SI NO SE A CREADO EL FORMULARIO
+            if (formularioTexto == null || formularioTexto.IsDisposed)
+            {
+                // SI NO, CREAMOS LA INSTANCIA
+                formularioTexto = new Programaobj();
+            }
 
-            Programaobj formularioTexto = new Programaobj();
+            List<string> entradamuestra = new List<string>(entradasobj);
 
-            formularioTexto.MostrarTexto(texto);
+            entradamuestra.RemoveAll(s => IsNumeric(s) && int.Parse(s) >= 1 && int.Parse(s) <= 12);
 
-          
-            formularioTexto.ShowDialog();
+            string contenido = string.Join(Environment.NewLine, entradamuestra);
+
+            formularioTexto.MostrarTexto(contenido);
+
+            formularioTexto.Show();
+
+            entradas++;
+        }
+
+        private bool IsNumeric(string input)
+        {
+            return int.TryParse(input, out _);
         }
 
         private void cambiardir_Click(object sender, EventArgs e)
