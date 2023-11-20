@@ -32,6 +32,12 @@
             this.cambiardir = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ejecutar = new System.Windows.Forms.Button();
             this.Dir = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.xd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -49,11 +55,6 @@
             this.Column15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column17 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
@@ -110,6 +111,49 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(896, 342);
             this.dataGridView1.TabIndex = 4;
+            // 
+            // dataGridView2
+            // 
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column2,
+            this.Column5,
+            this.Column18,
+            this.Column19});
+            this.dataGridView2.Location = new System.Drawing.Point(957, 82);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.Size = new System.Drawing.Size(453, 220);
+            this.dataGridView2.TabIndex = 5;
+            // 
+            // Column2
+            // 
+            this.Column2.HeaderText = "Seccion de control";
+            this.Column2.Name = "Column2";
+            // 
+            // Column5
+            // 
+            this.Column5.HeaderText = "Simbolo";
+            this.Column5.Name = "Column5";
+            // 
+            // Column18
+            // 
+            this.Column18.HeaderText = "Dirección";
+            this.Column18.Name = "Column18";
+            // 
+            // Column19
+            // 
+            this.Column19.HeaderText = "Longitud";
+            this.Column19.Name = "Column19";
+            // 
+            // ejecutar
+            // 
+            this.ejecutar.Location = new System.Drawing.Point(144, 33);
+            this.ejecutar.Name = "ejecutar";
+            this.ejecutar.Size = new System.Drawing.Size(75, 23);
+            this.ejecutar.TabIndex = 6;
+            this.ejecutar.Text = "Ejecutar";
+            this.ejecutar.UseVisualStyleBackColor = true;
+            this.ejecutar.Click += new System.EventHandler(this.ejecutar_Click);
             // 
             // Dir
             // 
@@ -230,44 +274,12 @@
             this.Column17.ReadOnly = true;
             this.Column17.Width = 50;
             // 
-            // dataGridView2
-            // 
-            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column2,
-            this.Column5,
-            this.Column18,
-            this.Column19});
-            this.dataGridView2.Location = new System.Drawing.Point(957, 82);
-            this.dataGridView2.Name = "dataGridView2";
-            this.dataGridView2.Size = new System.Drawing.Size(453, 220);
-            this.dataGridView2.TabIndex = 5;
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "Seccion de control";
-            this.Column2.Name = "Column2";
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Simbolo";
-            this.Column5.Name = "Column5";
-            // 
-            // Column18
-            // 
-            this.Column18.HeaderText = "Dirección";
-            this.Column18.Name = "Column18";
-            // 
-            // Column19
-            // 
-            this.Column19.HeaderText = "Longitud";
-            this.Column19.Name = "Column19";
-            // 
             // Cargador
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1461, 450);
+            this.ClientSize = new System.Drawing.Size(1370, 450);
+            this.Controls.Add(this.ejecutar);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.textBox1);
@@ -288,6 +300,12 @@
         private System.Windows.Forms.Button cambiardir;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
+        private System.Windows.Forms.Button ejecutar;
         private System.Windows.Forms.DataGridViewTextBoxColumn Dir;
         private System.Windows.Forms.DataGridViewTextBoxColumn xd;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
@@ -305,10 +323,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column17;
-        private System.Windows.Forms.DataGridView dataGridView2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
     }
 }
