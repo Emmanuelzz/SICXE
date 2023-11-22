@@ -106,12 +106,20 @@ namespace SICXE
         private void cambiardir_Click(object sender, EventArgs e)
         {
             string nuevoValor = textBox1.Text;
+            dirIni = nuevoValor;
             ren.Add("");
+            char ultimocaracter = nuevoValor[nuevoValor.Count()-1];
 
+            if (ultimocaracter != '0')//SI EL ULTIMO CARACTER NO ES ENTERO...ENTONCES HAZLO ENTERO
+            {
+                int pos = nuevoValor.Count() - 1;
 
+                StringBuilder sb = new StringBuilder(nuevoValor);
+                sb[pos] = '0';
+                nuevoValor = sb.ToString();
+            }
             dataGridView1.Rows[0].Cells[0].Value = nuevoValor;
             ren[0] = nuevoValor;
-            dirIni = nuevoValor;
 
             for (int i = 1; i < dataGridView1.Rows.Count; i++)
             {

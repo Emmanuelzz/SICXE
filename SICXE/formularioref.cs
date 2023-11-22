@@ -31,7 +31,7 @@ namespace SICXE
         public formularioref()
         {
             InitializeComponent();
-
+            cargarbutton.Visible = true;
 
         }
 
@@ -381,7 +381,7 @@ namespace SICXE
                     lineas.Clear();
                 }
             }
-            cargarbutton.Visible = true;
+            //cargarbutton.Visible = true;
         }
 
 
