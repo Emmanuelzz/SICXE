@@ -23,6 +23,7 @@ namespace SICXE
         public string dirIni = "";
         List<string> entradamuestra;
         List<List<string>> tabse = new List<List<string>>();
+        List<List<string>> mapa = new List<List<string>>();
 
         public Cargador()
         {
@@ -35,14 +36,19 @@ namespace SICXE
         {
             dataGridView1.Rows.Add("1000");
             ren.Add("1000");
+            renglonMapa(mapa, "1000");
             dataGridView1.Rows.Add("1010");
             ren.Add("1010");
+            renglonMapa(mapa, "1010");
             dataGridView1.Rows.Add("1020");
             ren.Add("1020");
+            renglonMapa(mapa, "1020");
             dataGridView1.Rows.Add("1030");
             ren.Add("1030");
+            renglonMapa(mapa, "1030");
             dataGridView1.Rows.Add("1040");
             ren.Add("1040");
+            renglonMapa(mapa, "1040");
             textBox1.Text = "1000";
             dirIni = "1000";
         }
@@ -108,6 +114,7 @@ namespace SICXE
             string nuevoValor = textBox1.Text;
             dirIni = nuevoValor;
             ren.Add("");
+            renglonMapa(mapa, "");
             char ultimocaracter = nuevoValor[nuevoValor.Count()-1];
 
             if (ultimocaracter != '0')//SI EL ULTIMO CARACTER NO ES ENTERO...ENTONCES HAZLO ENTERO
@@ -120,20 +127,24 @@ namespace SICXE
             }
             dataGridView1.Rows[0].Cells[0].Value = nuevoValor;
             ren[0] = nuevoValor;
+            mapa[0][0] = nuevoValor;
 
             for (int i = 1; i < dataGridView1.Rows.Count; i++)
             {
                 dataGridView1.Rows[i].Cells[0].Value = (int.Parse(nuevoValor) + 10 * i).ToString();
                 ren[i] = (int.Parse(nuevoValor) + 10 * i).ToString();
+                mapa[i][0]= (int.Parse(nuevoValor) + 10 * i).ToString();
             }
         }
 
         private void ejecutar_Click(object sender, EventArgs e)
         {
-            string dirsc = "", lonsc = "",direj="";
+            string dirsc = "", lonsc = "",direj="",inicio="",fin="";
+            List<string> relocalizacion = new List<string>();
             int i = 0;
             int index = 0,j=0,indice=0;
             string tem = "",aux="";
+            string colDir="";
             bool band = false;
             bool siguiente=false;
             #region Paso1
@@ -219,13 +230,16 @@ namespace SICXE
                             j = 1;
                             if (index < 0)
                             {
-
-                                dataGridView1.Rows.Add(direccion.ToString("X4").Remove(3) + "0");
-                                dataGridView1.Sort(dataGridView1.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
-                                ren.Add(direccion.ToString("X4").Remove(3) + "0");
-                                ren.Sort();
                                 index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
                                 j = columna(direccion.ToString("X4")[3]);
+                                if (index < 0)
+                                {
+                                    renglonMapa(mapa, direccion.ToString("X4").Remove(3) + "0");
+                                    ren.Add(direccion.ToString("X4").Remove(3) + "0");
+                                    ren.Sort();
+                                    index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
+                                    j = columna(direccion.ToString("X4")[3]);
+                                }
                             }
                            
                         }
@@ -233,8 +247,7 @@ namespace SICXE
                             index = ren.IndexOf(direccion.ToString("X4").Remove(3)+"0");
                             if (index < 0)
                             {
-                                dataGridView1.Rows.Add(direccion.ToString("X4").Remove(3) + "0");
-                                dataGridView1.Sort(dataGridView1.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+                                renglonMapa(mapa, direccion.ToString("X4").Remove(3) + "0");
                                 ren.Add(direccion.ToString("X4").Remove(3) + "0");
                                 ren.Sort();
                                 index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
@@ -244,15 +257,16 @@ namespace SICXE
                         // Imprimir las palabras de 6 caracteres
                         foreach (var palabra in palabras)
                         {
-                            dataGridView1.Rows[index].Cells[j].Value = palabra;
+                            if(inicio=="")
+                                inicio=index.ToString()+","+j.ToString();
+                            mapa[index][j] = palabra;
                             j++;
                             if (j > 16) {
                                 j = 1;
                                 index++;
-                                if (index > dataGridView1.Rows.Count - 2)
+                                if (index > ren.Count-1)
                                 {
-                                    dataGridView1.Rows.Add((Convert.ToInt32(ren[ren.Count - 1],16) + Convert.ToInt32("10", 16)).ToString("X4"));
-                                    dataGridView1.Sort(dataGridView1.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+                                    renglonMapa(mapa, (Convert.ToInt32(ren[ren.Count - 1], 16) + Convert.ToInt32("10", 16)).ToString("X4"));
                                     ren.Add((Convert.ToInt32(ren[ren.Count - 1], 16) + Convert.ToInt32("10", 16)).ToString("X4"));
                                 }
                             }
@@ -278,8 +292,7 @@ namespace SICXE
                                     index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
                                     if (index < 0)
                                     {
-                                        dataGridView1.Rows.Add(direccion.ToString("X4").Remove(3) + "0");
-                                        dataGridView1.Sort(dataGridView1.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+                                        renglonMapa(mapa, direccion.ToString("X4").Remove(3) + "0");
                                         ren.Add(direccion.ToString("X4").Remove(3) + "0");
                                         ren.Sort();
                                         index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
@@ -294,8 +307,7 @@ namespace SICXE
                                 index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
                                 if (index < 0)
                                 {
-                                    dataGridView1.Rows.Add(direccion.ToString("X4").Remove(3) + "0");
-                                    dataGridView1.Sort(dataGridView1.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+                                    renglonMapa(mapa, direccion.ToString("X4").Remove(3) + "0");
                                     ren.Add(direccion.ToString("X4").Remove(3) + "0");
                                     ren.Sort();
                                     index = ren.IndexOf(direccion.ToString("X4").Remove(3) + "0");
@@ -306,7 +318,7 @@ namespace SICXE
                             int b = j;
                             int c = index;
                             for (int a = 0; a < 3; a++) {
-                                aux += dataGridView1.Rows[c].Cells[b].Value;
+                                aux += mapa[c][b];
                                 b++;
                                 if (b > 16) {
                                     b = 1;
@@ -314,16 +326,23 @@ namespace SICXE
                                 }
                             }
                             if (aux != "")
-                                aux = (Convert.ToInt32(aux, 16) + Convert.ToInt32(valor, 16)).ToString("X6");
+                            {
+                                if(tem.Substring(9, 1) == "+")
+                                    aux = (Convert.ToInt32(aux, 16) + Convert.ToInt32(valor, 16)).ToString("X6");
+                                else
+                                    aux = (Convert.ToInt32(aux, 16) - Convert.ToInt32(valor, 16)).ToString("X6");
+                            }
                             else
+                            {
                                 aux = (Convert.ToInt32(valor, 16)).ToString("X6");
+                            }
                             b = j;
                             c = index;
+                            relocalizacion.Add(index.ToString() + ","+j.ToString());
                             int x = 0;
                             for (int a = 0; a < 3; a++)
                             {
-                                dataGridView1.Rows[c].Cells[b].Value = aux.Substring(x,2);
-                                dataGridView1.Rows[c].Cells[b].Style.BackColor= System.Drawing.Color.Yellow;
+                                mapa[c][b]= aux.Substring(x, 2);
                                 b++;
                                 x += 2;
                                 if (b > 16)
@@ -337,20 +356,52 @@ namespace SICXE
                     i++;
                     tem = entradamuestra[i];
                 }
-                direj = tem.Substring(1);
+                if (tem.Substring(1)!="")
+                    direj = (Convert.ToInt32(dirsc, 16) + Convert.ToInt32(tem.Substring(1), 16)).ToString("X6");
                 dirsc =(Convert.ToInt32(dirsc,16) + Convert.ToInt32(lonsc,16)).ToString("X6");
                 i++;
             }
+            fin = index.ToString() + "," + (j + 2).ToString();
             #endregion
 
             #region CargaTabse
             for (i = 0; i < tabse.Count; i++) {
+                dataGridView2.Rows.Add();
                 for (j = 0; j < 4; j++) {
-                    dataGridView2.Rows.Add();
                     dataGridView2.Rows[i].Cells[j].Value = tabse[i][j];
                 }
             }
             #endregion
+            #region cargaDataGrid
+            dataGridView1.Rows.Clear();
+            for (i = 0; i < ren.Count; i++)
+            {
+                dataGridView1.Rows.Add();
+                for (j = 0; j < 17; j++)
+                {
+                    dataGridView1.Rows[i].Cells[j].Value = mapa[i][j];
+                }
+            }
+            string[] indices = inicio.Split(',');
+            dataGridView1.Rows[int.Parse(indices[0])].Cells[int.Parse(indices[1])].Style.BackColor = System.Drawing.Color.Green;
+            indices = fin.Split(',');
+            dataGridView1.Rows[int.Parse(indices[0])].Cells[int.Parse(indices[1])].Style.BackColor = System.Drawing.Color.Red;
+            foreach (string r in relocalizacion) {
+                indices = r.Split(',');
+                int b = int.Parse(indices[1]);
+                int c = int.Parse(indices[0]);
+                for (i = 0; i < 3; i++) {
+                    dataGridView1.Rows[c].Cells[b].Style.BackColor = System.Drawing.Color.Yellow;
+                    b++;
+                    if (b > 16) {
+                        b = 1;
+                        c++;
+                    }
+                }
+            }
+            #endregion
+
+
         }
         public void renglonTabse(List<List<string>> tabse) {
             List<string> renTabse = new List<string>();
@@ -359,11 +410,21 @@ namespace SICXE
             }
             tabse.Add(renTabse);
         }
+
+        public void renglonMapa(List<List<string>> mapa,string s) {
+            List<string> renMapa = new List<string>();
+            renMapa.Add(s);
+            for (int i = 1; i < 17; i++)
+            {
+                renMapa.Add("");
+            }
+            mapa.Add(renMapa);
+        }
         public bool buscaTabse(string s,bool sec,ref int index) {
             if(sec)
                 s = s.Substring(1, 6);
             foreach (List<string> renglon in tabse) {
-                if (renglon.Contains(s))
+                if (renglon[0].Replace(" ","").Contains(s.Replace(" ",""))|| renglon[1].Replace(" ", "").Contains(s.Replace(" ", "")))
                 {
                     index = tabse.IndexOf(renglon);
                     return true;
